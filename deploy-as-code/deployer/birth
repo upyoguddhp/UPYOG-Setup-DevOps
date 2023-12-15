@@ -1,0 +1,286 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: birth-death-services
+    group: rainmaker
+  name: birth-death-services
+  namespace: egov
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: birth-death-services
+      group: rainmaker
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 0
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+        deployment-timestamp: "20230529042105"
+      creationTimestamp: null
+      labels:
+        app: birth-death-services
+        group: rainmaker
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  app: birth-death-services
+                  group: rainmaker
+              topologyKey: failure-domain.beta.kubernetes.io/zone
+            weight: 100
+      containers:
+      - env:
+        - name: SERVER_CONTEXTPATH
+          value: /birth-death-services
+        - name: SPRING_KAFKA_CONSUMER_GROUP_ID
+          value: birth-death-services
+        - name: SPRING_KAFKA_PRODUCER_KEY_SERIALIZER
+          value: org.apache.kafka.common.serialization.StringSerializer
+        - name: SPRING_KAFKA_PRODUCER_VALUE_SERIALIZER
+          value: org.springframework.kafka.support.serializer.JsonSerializer
+        - name: KAFKA_TOPICS_SAVE_SERVICE
+          value: save-birth-topic
+        - name: KAFKA_TOPICS_UPDATE_SERVICE
+          value: update-birth-topic
+        - name: EGOV_MDMS_HOST
+          valueFrom:
+            configMapKeyRef:
+              key: egov-mdms-service
+              name: egov-service-host
+        - name: EGOV_MDMS_SEARCH_ENDPOINT
+          value: /egov-mdms-service/v1/_search
+        - name: EGOV_BILLINGSERVICE_HOST
+          valueFrom:
+            configMapKeyRef:
+              key: billing-service
+              name: egov-service-host
+        - name: EGOV_IDGEN_HOST
+          valueFrom:
+            configMapKeyRef:
+              key: egov-idgen
+              name: egov-service-host
+        - name: EGOV_ENC_HOST
+          valueFrom:
+            configMapKeyRef:
+              key: egov-enc-service
+              name: egov-service-host
+        - name: EGOV_URL_SHORTNER_HOST
+          valueFrom:
+            configMapKeyRef:
+              key: egov-url-shortening
+              name: egov-service-host
+        - name: EGOV_PDF_HOST
+          valueFrom:
+            configMapKeyRef:
+              key: egov-pdf
+              name: egov-service-host
+        - name: EGOV_COLLECTION_SERVICE_HOST
+          valueFrom:
+            configMapKeyRef:
+              key: collection-services
+              name: egov-service-host
+        - name: EGOV_PDFSERVICE_HOST
+          valueFrom:
+            configMapKeyRef:
+              key: pdf-service
+              name: egov-service-host
+        - name: EGOV_STATE_LEVEL_TENANT_ID
+          valueFrom:
+            configMapKeyRef:
+              key: egov-state-level-tenant-id
+              name: egov-config
+        - name: EGOV_BND_FREEDOWNLOAD_TENANTS
+          valueFrom:
+            configMapKeyRef:
+              key: egov-bnd-freedownload-tenants
+              name: egov-config
+        - name: EGOV_BND_LIVE_CITIZEN_TENANTS
+          valueFrom:
+            configMapKeyRef:
+              key: egov-bnd-live-citizen-tenants
+              name: egov-config
+        - name: JAVA_OPTS
+          value: -Xmx192m -Xms192m
+        - name: JAVA_ARGS
+          value: -Dspring.profiles.active=monitoring
+        - name: SERVER_PORT
+          value: "8080"
+        - name: SECURITY_BASIC_ENABLED
+          value: "false"
+        - name: MANAGEMENT_SECURITY_ENABLED
+          value: "false"
+        - name: TRACER_OPENTRACING_ENABLED
+          value: "true"
+        - name: SPRING_DATASOURCE_URL
+          valueFrom:
+            configMapKeyRef:
+              key: db-url
+              name: egov-config
+        - name: FLYWAY_ENABLED
+          value: "false"
+        - name: SPRING_FLYWAY_ENABLED
+          value: "false"
+        - name: MANAGEMENT_ENDPOINTS_WEB_BASE_PATH
+          value: /
+        - name: APP_TIMEZONE
+          valueFrom:
+            configMapKeyRef:
+              key: timezone
+              name: egov-config
+        - name: FLYWAY_URL
+          valueFrom:
+            configMapKeyRef:
+              key: db-url
+              name: egov-config
+        - name: SPRING_DATASOURCE_USERNAME
+          valueFrom:
+            secretKeyRef:
+              key: username
+              name: db
+        - name: SPRING_DATASOURCE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: password
+              name: db
+        - name: SPRING_DATASOURCE_TOMCAT_INITIAL_SIZE
+          valueFrom:
+            configMapKeyRef:
+              key: spring-datasource-tomcat-initialSize
+              name: egov-config
+        - name: SERVER_TOMCAT_MAX_THREADS
+          valueFrom:
+            configMapKeyRef:
+              key: server-tomcat-max-threads
+              name: egov-config
+        - name: SERVER_TOMCAT_MAX_CONNECTIONS
+          valueFrom:
+            configMapKeyRef:
+              key: server-tomcat-max-connections
+              name: egov-config
+        - name: SPRING_DATASOURCE_TOMCAT_MAX_ACTIVE
+          valueFrom:
+            configMapKeyRef:
+              key: spring-datasource-tomcat-max-active
+              name: egov-config
+        - name: SPRING_DATASOURCE_HIKARI_MAXIMUM-POOL-SIZE
+          valueFrom:
+            configMapKeyRef:
+              key: spring-datasource-tomcat-max-active
+              name: egov-config
+        - name: KAFKA_CONFIG_BOOTSTRAP_SERVER_CONFIG
+          valueFrom:
+            configMapKeyRef:
+              key: kafka-brokers
+              name: egov-config
+        - name: SPRING_KAFKA_BOOTSTRAP_SERVERS
+          valueFrom:
+            configMapKeyRef:
+              key: kafka-brokers
+              name: egov-config
+        - name: SPRING_JPA_SHOW_SQL
+          valueFrom:
+            configMapKeyRef:
+              key: spring-jpa-show-sql
+              name: egov-config
+        - name: JAEGER_SERVICE_NAME
+          value: birth-death-services
+        - name: JAEGER_SAMPLER_TYPE
+          value: remote
+        - name: JAEGER_AGENT_HOST
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: status.hostIP
+        - name: JAEGER_AGENT_PORT
+          value: "6831"
+        - name: JAEGER_SAMPLER_MANAGER_HOST_PORT
+          value: $(JAEGER_AGENT_HOST):5778
+        - name: TRACER_OPENTRACING_ENABLED
+          value: "true"
+        image: upyogio/birth-death-services:dev-5dbbcb807b-4
+        imagePullPolicy: IfNotPresent
+        lifecycle:
+          preStop:
+            exec:
+              command:
+              - sh
+              - -c
+              - sleep 10
+        livenessProbe:
+          failureThreshold: 5
+          httpGet:
+            path: /birth-death-services/health
+            port: 8080
+            scheme: HTTP
+          initialDelaySeconds: 30
+          periodSeconds: 60
+          successThreshold: 1
+          timeoutSeconds: 3
+        name: birth-death-services
+        ports:
+        - containerPort: 8080
+          name: http
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 5
+          httpGet:
+            path: /birth-death-services/health
+            port: 8080
+            scheme: HTTP
+          initialDelaySeconds: 30
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 3
+        resources:
+          limits:
+            memory: 512Mi
+          requests:
+            memory: 512Mi
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      initContainers:
+      - env:
+        - name: DB_URL
+          valueFrom:
+            configMapKeyRef:
+              key: db-url
+              name: egov-config
+        - name: SCHEMA_TABLE
+          value: birth_death_services_schema
+        - name: FLYWAY_USER
+          valueFrom:
+            secretKeyRef:
+              key: flyway-username
+              name: db
+        - name: FLYWAY_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: flyway-password
+              name: db
+        - name: FLYWAY_LOCATIONS
+          valueFrom:
+            configMapKeyRef:
+              key: flyway-locations
+              name: egov-config
+        image: upyogio/birth-death-services-db:dev-5dbbcb807b-4
+        imagePullPolicy: IfNotPresent
+        name: db-migration
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+

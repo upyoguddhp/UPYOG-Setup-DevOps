@@ -1,0 +1,29 @@
+# Please edit the object below. Lines beginning with a '#' will be ignored,
+# and an empty file will abort the edit. If an error occurs while saving this file will be
+# reopened with the relevant failures.
+#
+apiVersion: storage.k8s.io/v1
+kind: VolumeAttachment
+metadata:
+  annotations:
+    csi.alpha.kubernetes.io/node-id: i-086c0396e38f568a9
+  creationTimestamp: "2023-10-10T22:07:12Z"
+  deletionGracePeriodSeconds: 0
+  deletionTimestamp: "2023-10-11T09:27:00Z"
+  name: csi-9932a41d1ead1a7124a1fa4b833693e78296c7be10d140df54b42cfb4c39004c
+  resourceVersion: "88705908"
+  uid: 8002ca24-e6a0-47b6-bb2c-ed584acedc02
+spec:
+  attacher: ebs.csi.aws.com
+  nodeName: ip-192-168-93-201.ap-south-1.compute.internal
+  source:
+    persistentVolumeName: kafka-data-kafka-v2-0
+status:
+  attachError:
+    message: CSINode ip-192-168-93-201.ap-south-1.compute.internal does not contain
+      driver ebs.csi.aws.com
+    time: "2023-10-11T06:44:02Z"
+  attached: false
+  detachError:
+    message: persistentvolume "kafka-data-kafka-v2-0" not found
+    time: "2023-10-13T07:37:57Z"

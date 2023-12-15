@@ -1,0 +1,240 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: inbox
+    group: rainmaker
+  name: inbox
+  namespace: egov
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: inbox
+      group: rainmaker
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 0
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+        deployment-timestamp: "20230821104630"
+      creationTimestamp: null
+      labels:
+        app: inbox
+        group: rainmaker
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  app: inbox
+                  group: rainmaker
+              topologyKey: failure-domain.beta.kubernetes.io/zone
+            weight: 100
+      containers:
+      - env:
+        - name: WORKFLOW_HOST
+          valueFrom:
+            configMapKeyRef:
+              key: egov-workflow-v2
+              name: egov-service-host
+        - name: WORKFLOW_PROCESS_SEARCH_PATH
+          value: egov-workflow-v2/egov-wf/process/_search
+        - name: WORKFLOW_BUSINESSSERVICE_SEARCH_PATH
+          value: egov-workflow-v2/egov-wf/businessservice/_search
+        - name: WORKFLOW_PROCESS_COUNT_PATH
+          value: egov-workflow-v2/egov-wf/process/_count
+        - name: WORKFLOW_PROCESS_STATUSCOUNT_PATH
+          value: egov-workflow-v2/egov-wf/process/_statuscount
+        - name: EGOV_USER_HOST
+          valueFrom:
+            configMapKeyRef:
+              key: egov-user
+              name: egov-service-host
+        - name: EGOV_USER_SEARCH_PATH
+          value: user/_search
+        - name: EGOV_SEARCHER_HOST
+          valueFrom:
+            configMapKeyRef:
+              key: egov-searcher
+              name: egov-service-host
+        - name: EGOV_MDMS_HOST
+          valueFrom:
+            configMapKeyRef:
+              key: egov-mdms-service
+              name: egov-service-host
+        - name: SERVICES_ESINDEXER_HOST
+          valueFrom:
+            configMapKeyRef:
+              key: es-indexer-host
+              name: egov-config
+        - name: STATE_LEVEL_TENANT_ID
+          valueFrom:
+            configMapKeyRef:
+              key: egov-state-level-tenant-id
+              name: egov-config
+        - name: EGOV_INTERNAL_MICROSERVICE_USER_UUID
+          valueFrom:
+            configMapKeyRef:
+              key: egov-internal-microservice-user-uuid
+              name: egov-config
+        - name: EGOV_SEARCHER_PT_SEARCH_PATH
+          value: egov-searcher/property-services/inboxpropertysearch/_get
+        - name: SERVICE_SEARCH_MAPPING
+          value: '{"FSM":{"searchPath":"http://fsm.egov:8080/fsm/v1/_search","dataRoot":"fsm","applNosParam":"applicationNos","businessIdProperty":"applicationNo"},"FSM_POST_PAY_SERVICE":{"searchPath":"http://fsm.egov:8080/fsm/v1/_search","dataRoot":"fsm","applNosParam":"applicationNos","businessIdProperty":"applicationNo","applsStatusParam":"applicationStatus"},"FSM_VEHICLE_TRIP":{"searchPath":"http://vehicle.egov:8080/vehicle/trip/v1/_search","dataRoot":"vehicleTrip","applNosParam":"applicationNos","businessIdProperty":"applicationNo"},"PT.CREATE,PT.UPDATE,PT.MUTATION":{"searchPath":"http://property-services.egov:8080/property-services/property/_search","dataRoot":"Properties","applNosParam":"acknowldgementNumber","businessIdProperty":"acknowldgementNumber","applsStatusParam":"status"},"NewTL,DIRECTRENEWAL,EDITRENEWAL":{"searchPath":"http://tl-services.egov:8080/tl-services/v1/_search","dataRoot":"Licenses","applNosParam":"applicationNumber","businessIdProperty":"applicationNumber","applsStatusParam":"status"},"BPA_LOW,BPA,BPA_OC,BPA_HIGH":{"searchPath":"http://bpa-services.egov:8080/bpa-services/v1/bpa/_search","dataRoot":"BPA","applNosParam":"applicationNo","businessIdProperty":"applicationNo","applsStatusParam":"status"},"ARCHITECT,ENGINEER,STRUCTURALENGINEER,BUILDER,SUPERVISOR,TOWNPLANNER":{"searchPath":"http://tl-services.egov:8080/tl-services/v1/BPAREG/_search","dataRoot":"Licenses","applNosParam":"applicationNumber","businessIdProperty":"applicationNumber","applsStatusParam":"status"},"FIRE_NOC_SRV,FIRE_NOC_OFFLINE,AIRPORT_NOC_OFFLINE,AIRPORT_NOC_SRV":{"searchPath":"http://noc-services.egov:8080/noc-services/v1/noc/_search","dataRoot":"Noc","applNosParam":"applicationNo","businessIdProperty":"applicationNo","applsStatusParam":"status"},"NewWS1,ModifyWSConnection,DisconnectWSConnection":{"searchPath":"http://ws-services.egov:8080/ws-services/wc/_search","dataRoot":"WaterConnection","applNosParam":"applicationNumber","businessIdProperty":"applicationNo","applsStatusParam":"applicationStatus"},"NewSW1,ModifySWConnection,DisconnectSWConnection":{"searchPath":"http://sw-services.egov:8080/sw-services/swc/_search","dataRoot":"SewerageConnections","applNosParam":"applicationNumber","businessIdProperty":"applicationNo","applsStatusParam":"applicationStatus"},"WS.AMENDMENT,SW.AMENDMENT":{"searchPath":"http://billing-service.egov:8080/billing-service/amendment/_search","dataRoot":"Amendments","applNosParam":"consumerCode","businessIdProperty":"amendmentId","applsStatusParam":"status"}}'
+        - name: JAVA_OPTS
+          value: -Xmx256m -Xms256m
+        - name: JAVA_ARGS
+          value: -Dspring.profiles.active=monitoring
+        - name: SERVER_PORT
+          value: "8080"
+        - name: SECURITY_BASIC_ENABLED
+          value: "false"
+        - name: MANAGEMENT_SECURITY_ENABLED
+          value: "false"
+        - name: BS_BUSINESSCODE_SERVICE_SEARCH
+          value: '{"WS":{"searchPath":"http://ws-services.egov:8080/ws-services/wc/_search","dataRoot":"WaterConnection","consumerCodeParam":"connectionNumber"},"SW":{"searchPath":"http://sw-services.egov:8080/sw-services/swc/_search","dataRoot":"SewerageConnections","consumerCodeParam":"connectionNumber"}}'
+        - name: WATER_ES_INDEX
+        - name: SEWERAGE_ES_INDEX
+        - name: TRACER_OPENTRACING_ENABLED
+          value: "true"
+        - name: TRACER_OPENTRACING_ENABLED
+          value: "true"
+        - name: SPRING_DATASOURCE_URL
+          valueFrom:
+            configMapKeyRef:
+              key: db-url
+              name: egov-config
+        - name: FLYWAY_ENABLED
+          value: "false"
+        - name: SPRING_FLYWAY_ENABLED
+          value: "false"
+        - name: MANAGEMENT_ENDPOINTS_WEB_BASE_PATH
+          value: /
+        - name: APP_TIMEZONE
+          valueFrom:
+            configMapKeyRef:
+              key: timezone
+              name: egov-config
+        - name: FLYWAY_URL
+          valueFrom:
+            configMapKeyRef:
+              key: db-url
+              name: egov-config
+        - name: SPRING_DATASOURCE_USERNAME
+          valueFrom:
+            secretKeyRef:
+              key: username
+              name: db
+        - name: SPRING_DATASOURCE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: password
+              name: db
+        - name: SPRING_DATASOURCE_TOMCAT_INITIAL_SIZE
+          valueFrom:
+            configMapKeyRef:
+              key: spring-datasource-tomcat-initialSize
+              name: egov-config
+        - name: SERVER_TOMCAT_MAX_THREADS
+          valueFrom:
+            configMapKeyRef:
+              key: server-tomcat-max-threads
+              name: egov-config
+        - name: SERVER_TOMCAT_MAX_CONNECTIONS
+          valueFrom:
+            configMapKeyRef:
+              key: server-tomcat-max-connections
+              name: egov-config
+        - name: SPRING_DATASOURCE_TOMCAT_MAX_ACTIVE
+          valueFrom:
+            configMapKeyRef:
+              key: spring-datasource-tomcat-max-active
+              name: egov-config
+        - name: SPRING_DATASOURCE_HIKARI_MAXIMUM-POOL-SIZE
+          valueFrom:
+            configMapKeyRef:
+              key: spring-datasource-tomcat-max-active
+              name: egov-config
+        - name: KAFKA_CONFIG_BOOTSTRAP_SERVER_CONFIG
+          valueFrom:
+            configMapKeyRef:
+              key: kafka-brokers
+              name: egov-config
+        - name: SPRING_KAFKA_BOOTSTRAP_SERVERS
+          valueFrom:
+            configMapKeyRef:
+              key: kafka-brokers
+              name: egov-config
+        - name: SPRING_JPA_SHOW_SQL
+          valueFrom:
+            configMapKeyRef:
+              key: spring-jpa-show-sql
+              name: egov-config
+        - name: JAEGER_SERVICE_NAME
+          value: inbox
+        - name: JAEGER_SAMPLER_TYPE
+          value: remote
+        - name: JAEGER_AGENT_HOST
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: status.hostIP
+        - name: JAEGER_AGENT_PORT
+          value: "6831"
+        - name: JAEGER_SAMPLER_MANAGER_HOST_PORT
+          value: $(JAEGER_AGENT_HOST):5778
+        image: upyogio/inbox:Dev-2.0-8f9948e577-12
+        imagePullPolicy: IfNotPresent
+        lifecycle:
+          preStop:
+            exec:
+              command:
+              - sh
+              - -c
+              - sleep 10
+        livenessProbe:
+          failureThreshold: 5
+          httpGet:
+            path: /inbox/health
+            port: 8080
+            scheme: HTTP
+          initialDelaySeconds: 30
+          periodSeconds: 60
+          successThreshold: 1
+          timeoutSeconds: 3
+        name: inbox
+        ports:
+        - containerPort: 8080
+          name: http
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 5
+          httpGet:
+            path: /inbox/health
+            port: 8080
+            scheme: HTTP
+          initialDelaySeconds: 30
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 3
+        resources:
+          limits:
+            memory: 512Mi
+          requests:
+            memory: 512Mi
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+

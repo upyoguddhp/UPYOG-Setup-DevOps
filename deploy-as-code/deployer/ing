@@ -1,0 +1,245 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: national-dashboard-ingest
+    group: rainmaker
+  name: national-dashboard-ingest
+  namespace: egov
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 3
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: national-dashboard-ingest
+      group: rainmaker
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+        deployment-timestamp: "20231019082618"
+      creationTimestamp: null
+      labels:
+        app: national-dashboard-ingest
+        group: rainmaker
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  app: national-dashboard-ingest
+                  group: rainmaker
+              topologyKey: failure-domain.beta.kubernetes.io/zone
+            weight: 100
+      containers:
+      - env:
+        - name: SPRING_KAFKA_CONSUMER_GROUP_ID
+          value: egov-nss-ingest
+        - name: SPRING_KAFKA_PRODUCER_KEY_SERIALIZER
+          value: org.apache.kafka.common.serialization.StringSerializer
+        - name: SPRING_KAFKA_PRODUCER_VALUE_SERIALIZER
+          value: org.springframework.kafka.support.serializer.JsonSerializer
+        - name: EGOV_ES_HOST
+          valueFrom:
+            configMapKeyRef:
+              key: es-indexer-host
+              name: egov-config
+        - name: MODULE_INDEX_MAPPING
+          value: '{"PT": "pt-national-dashboard", "PGR": "pgr-national-dashboard",
+            "WS": "ws-national-dashboard", "FIRENOC": "firenoc-national-dashboard",
+            "TL": "tl-national-dashboard", "MCOLLECT": "mcollect-national-dashboard",
+            "OBPS": "obps-national-dashboard", "COMMON": "common-national-dashboard",
+            "BPA": "bpa-national-dashboard","BIRTH":"birth-cert-national-dashboard","DEATH":"death-cert-national-dashboard","FSM":
+            "fsm-national-dashboard","CF":"citizen-feedback-national-dashboard"}'
+        - name: MASTER_DATA_INDEX
+          value: master-national-dashboard
+        - name: NATIONAL_DASHBOARD_USER
+          value: '{"Jharkhand":"f3d7cf4c-a2ec-43bc-be9c-053d742a1a75","Punjab":"54rr1169-7ae7-4589-95ba-5b2bb5f56894","Karnataka":"54dd1169-7ae7-4589-95ba-5b2bb5f56894","Rajasthan":"ae03f0cc-50cd-416d-aaf5-e84ec90a0e79","Goa":"689730b2-8f64-4014-9b8c-b57d98d4468c","Andhra
+            Pradesh":"5c2827cf-02a9-424e-b71d-60c3e6dbcf59","Madhya Pradesh":"05258013-f7ea-4ca1-a268-bc04baf9dbf2","Telangana":"270136f7-761f-46a8-bc93-a16839e90773","Kerala":"4ff2577b-14d6-466f-a47d-fd22a061e5a5","Tamil
+            Nadu":"bac5ca3b-1c04-4667-98e6-7bdcf8b6f2e8","Chandigarh":"54nn1169-7ae7-4589-95ba-5b2bb5f56894","Chhattisgarh":"6a705c9c-d418-4fdf-a61f-c178350484e3","Maharashtra":"fc9663d0-00e5-4060-b85e-0fb2f3be1409","Uttarakhand":"5t7r1169-7ae7-4589-95ba-5b2bb5f56894"}'
+        - name: MODULE_FIELDS_MAPPING
+          value: '{"PT":{"transactions":"array::number","todaysTotalApplications":"number","todaysClosedApplications":"number","assessments":"number","assessedProperties":"array::number","propertiesRegistered":"array::number","todaysCollection":"array::number","propertyTax":"array::number","cess":"array::number","rebate":"array::number","penalty":"array::number","interest":"array::number","noOfPropertiesPaidToday":"number","todaysApprovedApplications":"number","todaysApprovedApplicationsWithinSLA":"number","avgDaysForApplicationApproval":"number","StipulatedDays":"number","todaysApplicationsWithinSLA":"number","todaysMovedApplications":"array::number"},"TL":{"transactions":"number","todaysApplications":"number","todaysLicenseIssuedWithinSLA":"number","tlTax":"number","adhocPenalty":"number","adhocRebate":"number","todaysCollection":"array::number","todaysTradeLicenses":"array::number","applicationsMovedToday":"array::number","todaysApprovedApplications":"number","todaysApprovedApplicationsWithinSLA":"number","avgDaysForApplicationApproval":"number","StipulatedDays":"number"},"PGR":{"uniqueCitizens":"number","todaysComplaints":"array::number","todaysReopenedComplaints":"array::number","todaysOpenComplaints":"array::number","todaysAssignedComplaints":"array::number","todaysRejectedComplaints":"array::number","todaysReassignedComplaints":"array::number","todaysReassignRequestedComplaints":"array::number","todaysClosedComplaints":"array::number","todaysResolvedComplaints":"array::number","slaAchievement":"array::number","completionRate":"array::number","averageSolutionTime":"array::number","avgDaysForApplicationApproval":"number","StipulatedDays":"number"},"WS":{"transactions":"number","connectionsCreated":"array::number","todaysCollection":"array::number","sewerageConnections":"array::number","waterConnections":"array::number","pendingConnections":"array::number","slaCompliance":"number","todaysTotalApplications":"number","todaysClosedApplications":"number","todaysCompletedApplicationsWithinSLA":"number","avgDaysForApplicationApproval":"number","StipulatedDays":"number"},"MCOLLECT":{"numberOfCategories":"number","todaysCollection":"array::number","numberOfReceipts":"array::number","numberOfChallans":"array::number"},"OBPS":{"ocPlansScrutinized":"number","plansScrutinized":"number","ocSubmitted":"number","applicationsSubmitted":"number","ocIssued":"number","landAreaAppliedInSystemForBPA":"number","averageDaysToIssuePermit":"number","averageDaysToIssueOC":"number","todaysCollection":"array::number","permitsIssued":"array::number","todaysClosedApplicationsOC":"number","todaysCompletedApplicationsWithinSLAOC":"number","todaysClosedApplicationsPermit":"number","todaysCompletedApplicationsWithinSLAPermit":"number","slaComplianceOC":"number","slaCompliancePermit":"number","applicationsWithDeviation":"number","averageDeviation":"number","ocWithDeviation":"number","todaysApprovedApplications":"number","todaysApprovedApplicationsWithinSLA":"number","avgDaysForApplicationApproval":"number","StipulatedDays":"number"},"FIRENOC":{"todaysApplications":"array::number","todaysCollection":"array::number","nocIssuedToday":"array::number","provisionalNOCIssued":"array::number","actualNOCIssued":"array::number","avgDaysToIssueProvisionalNOC":"array::number","slaComplianceActual":"array::number","slaComplianceProvisional":"array::number","avgDaysToIssueActualNOC":"array::number","todaysClosedApplications":"number","todaysCompletedApplicationsWithinSLA":"number","todaysApprovedApplications":"number","todaysApprovedApplicationsWithinSLA":"number","avgDaysForApplicationApproval":"number","StipulatedDays":"number"},"COMMON":{"onboardedUlbsCount":"number","totalCitizensCount":"number","slaAchievement":"number","liveUlbsCount":"array::number","status":"string","totalLiveUlbsCount":"number","totalUlbCount":"number"},"BIRTH":{"todaysCollection":"array::number","numberOfCertificatesDownloadedToday":"array::number","numberOfBirthsToday":"array::number","todaysApprovedApplications":"number","todaysApprovedApplicationsWithinSLA":"number","avgDaysForApplicationApproval":"number","StipulatedDays":"number"},"DEATH":{"todaysCollection":"array::number","numberOfCertificatesDownloadedToday":"array::number","numberOfDeathsToday":"array::number","todaysApprovedApplications":"number","todaysApprovedApplicationsWithinSLA":"number","avgDaysForApplicationApproval":"number","StipulatedDays":"number"},"FSM":{"transactions":"number","todaysApplications":"number","todaysApprovedApplicationsWithinSLA":"number","todaysClosedApplications":"number","todaysApprovedApplications":"number","totalVehicleTrips":"number","totalSludgeDumped":"number","totalSludgeCollected":"number","totalFSTPCapacity":"number","todaysCollection":"array::number","averageCitizenRating":"number"},"CF":{
+            "todaysNoOfCitizenResponses":"array::number","todaysAverageCitizenRating":"number","serviceModule":"string","serviceType":"string"}}'
+        - name: MASTER_MODULE_FIELDS_MAPPING
+          value: '{"PT":{"snoForMunicipalCorporation":"string","ulbName":"string","date":"string","budgetProposedForMunicipalCorporation":"number","StateGDP":"number","statePopulation":"number","stateHousehold":"number","noOfProperties":"number"},"PGR":{"snoForMunicipalCorporation":"string","ulbName":"string","date":"string","budgetProposedForMunicipalCorporation":"number","stateHousehold":"number"},"TL":{"snoForMunicipalCorporation":"string","ulbName":"string","date":"string","budgetProposedForMunicipalCorporation":"number","StateGDP":"number","statePopulation":"number","stateHousehold":"number","noOfProperties":"number"},"WS":{"snoForMunicipalCorporation":"string","ulbName":"string","date":"string","budgetProposedForMunicipalCorporation":"number","StateGDP":"number","statePopulation":"number","stateHousehold":"number","noOfProperties":"number"},"MCOLLECT":{"snoForMunicipalCorporation":"string","ulbName":"string","date":"string","budgetProposedForMunicipalCorporation":"number","StateGDP":"number","statePopulation":"number","stateHousehold":"number"},"OBPS":{"snoForMunicipalCorporation":"string","ulbName":"string","date":"string","budgetProposedForMunicipalCorporation":"number","StateGDP":"number","statePopulation":"number","stateHousehold":"number","noOfProperties":"number"},"FIRENOC":{"snoForMunicipalCorporation":"string","ulbName":"string","date":"string","budgetProposedForMunicipalCorporation":"number","StateGDP":"number","statePopulation":"number","stateHousehold":"number","noOfProperties":"number"},"BIRTH":{"snoForMunicipalCorporation":"string","ulbName":"string","date":"string","budgetProposedForMunicipalCorporation":"number","StateGDP":"number","statePopulation":"number","stateHousehold":"number"},"DEATH":{"snoForMunicipalCorporation":"string","ulbName":"string","date":"string","budgetProposedForMunicipalCorporation":"number","StateGDP":"number","statePopulation":"number","stateHousehold":"number"},"FSM":{"snoForMunicipalCorporation":"string","ulbName":"string","date":"string","budgetProposedForMunicipalCorporation":"number","StateGDP":"number","statePopulation":"number","stateHousehold":"number","noOfProperties":"number"},"CF":{"snoForMunicipalCorporation":"string","ulbName":"string","date":"string","budgetProposedForMunicipalCorporation":"number"}}'
+        - name: MODULE_ALLOWED_GROUPBY_FIELDS_MAPPING
+          value: '{"PT":{"financialYear","usageCategory","paymentChannelType","applicationStatus"},"WS":{"connectionType","channelType","usageType","paymentChannelType","taxHeads","meterType","duration"},"FIRENOC":{"applicationType","department","paymentMode","type","usageType"},"OBPS":{"paymentMode","riskType","occupancyType","subOccupancyType"},"PGR":{"status","channel","department","category"},"TL":{"tradeType","status","paymentChannelType"},"MCOLLECT":{"paymentMode","status","category","challanStatus"},"COMMON":{"serviceModuleCode"},"BIRTH":{"channel","gender","boundary"},"DEATH":{"channel","gender","boundary","age"},"FSM":{"paymentChannelType","usageCategory"},"CF":{"channel"}}'
+        - name: SERVER_TOMCAT_MAX_THREADS
+          value: "25"
+        - name: SERVER_TOMCAT_MAX_THREADS
+          value: "25"
+        - name: JAVA_OPTS
+          value: -Xmx750m -Xms750m
+        - name: SERVER_PORT
+          value: "8080"
+        - name: JAVA_ARGS
+          value: -Dspring.profiles.active=monitoring
+        - name: SECURITY_BASIC_ENABLED
+          value: "false"
+        - name: MANAGEMENT_SECURITY_ENABLED
+          value: "false"
+        - name: SPRING_DATASOURCE_URL
+          valueFrom:
+            configMapKeyRef:
+              key: db-url
+              name: egov-config
+        - name: FLYWAY_ENABLED
+          value: "false"
+        - name: SPRING_FLYWAY_ENABLED
+          value: "false"
+        - name: MANAGEMENT_ENDPOINTS_WEB_BASE_PATH
+          value: /
+        - name: APP_TIMEZONE
+          valueFrom:
+            configMapKeyRef:
+              key: timezone
+              name: egov-config
+        - name: FLYWAY_URL
+          valueFrom:
+            configMapKeyRef:
+              key: db-url
+              name: egov-config
+        - name: SPRING_DATASOURCE_USERNAME
+          valueFrom:
+            secretKeyRef:
+              key: username
+              name: db
+        - name: SPRING_DATASOURCE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: password
+              name: db
+        - name: SPRING_DATASOURCE_TOMCAT_INITIAL_SIZE
+          valueFrom:
+            configMapKeyRef:
+              key: spring-datasource-tomcat-initialSize
+              name: egov-config
+        - name: SERVER_TOMCAT_MAX_CONNECTIONS
+          valueFrom:
+            configMapKeyRef:
+              key: server-tomcat-max-connections
+              name: egov-config
+        - name: SPRING_DATASOURCE_TOMCAT_MAX_ACTIVE
+          valueFrom:
+            configMapKeyRef:
+              key: spring-datasource-tomcat-max-active
+              name: egov-config
+        - name: SPRING_DATASOURCE_HIKARI_MAXIMUM-POOL-SIZE
+          valueFrom:
+            configMapKeyRef:
+              key: spring-datasource-tomcat-max-active
+              name: egov-config
+        - name: KAFKA_CONFIG_BOOTSTRAP_SERVER_CONFIG
+          valueFrom:
+            configMapKeyRef:
+              key: kafka-brokers
+              name: egov-config
+        - name: SPRING_KAFKA_BOOTSTRAP_SERVERS
+          valueFrom:
+            configMapKeyRef:
+              key: kafka-brokers
+              name: egov-config
+        - name: SPRING_JPA_SHOW_SQL
+          valueFrom:
+            configMapKeyRef:
+              key: spring-jpa-show-sql
+              name: egov-config
+        - name: JAEGER_SERVICE_NAME
+          value: national-dashboard-ingest
+        - name: JAEGER_SAMPLER_TYPE
+          value: remote
+        - name: JAEGER_AGENT_HOST
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: status.hostIP
+        - name: JAEGER_AGENT_PORT
+          value: "6831"
+        - name: JAEGER_SAMPLER_MANAGER_HOST_PORT
+          value: $(JAEGER_AGENT_HOST):5778
+        - name: TRACER_OPENTRACING_ENABLED
+          value: "true"
+        image: upyogio/national-dashboard-ingest:Dev-2.0-0c005f83f1-37
+        imagePullPolicy: IfNotPresent
+        lifecycle:
+          preStop:
+            exec:
+              command:
+              - sh
+              - -c
+              - sleep 10
+        livenessProbe:
+          failureThreshold: 5
+          httpGet:
+            path: /national-dashboard/health
+            port: 8080
+            scheme: HTTP
+          initialDelaySeconds: 30
+          periodSeconds: 60
+          successThreshold: 1
+          timeoutSeconds: 3
+        name: national-dashboard-ingest
+        ports:
+        - containerPort: 8080
+          name: http
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 5
+          httpGet:
+            path: /national-dashboard/health
+            port: 8080
+            scheme: HTTP
+          initialDelaySeconds: 30
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 3
+        resources:
+          limits:
+            memory: 512Mi
+          requests:
+            memory: 512Mi
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      initContainers:
+      - env:
+        - name: DB_URL
+          valueFrom:
+            configMapKeyRef:
+              key: db-url
+              name: egov-config
+        - name: SCHEMA_TABLE
+          value: national_dashboard_ingest_schema
+        - name: FLYWAY_USER
+          valueFrom:
+            secretKeyRef:
+              key: flyway-username
+              name: db
+        - name: FLYWAY_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: flyway-password
+              name: db
+        - name: FLYWAY_LOCATIONS
+          valueFrom:
+            configMapKeyRef:
+              key: flyway-locations
+              name: egov-config
+        image: upyogio/national-dashboard-ingest-db:Dev-2.0-0c005f83f1-37
+        imagePullPolicy: IfNotPresent
+        name: db-migration
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+

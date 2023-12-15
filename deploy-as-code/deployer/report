@@ -1,0 +1,230 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: report
+    group: reportinfra
+  name: report
+  namespace: egov
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: report
+      group: reportinfra
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 0
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+        deployment-timestamp: "20231023121004"
+      creationTimestamp: null
+      labels:
+        app: report
+        group: reportinfra
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  app: report
+                  group: reportinfra
+              topologyKey: failure-domain.beta.kubernetes.io/zone
+            weight: 100
+      containers:
+      - env:
+        - name: SERVER_CONTEXTPATH
+          value: /report
+        - name: REPORT_LOCATIONSFILE_PATH
+          value: file:///work-dir/upyog-configs/configs/reports/reportFileLocationsv1.txt
+        - name: JAVA_OPTS
+          value: -Xmx192m -Xms192m
+        - name: SERVER_PORT
+          value: "8080"
+        - name: TRACER_OPENTRACING_ENABLED
+          value: "true"
+        - name: TRACER_OPENTRACING_ENABLED
+          value: "true"
+        - name: TRACER_OPENTRACING_ENABLED
+          value: "true"
+        - name: SECURITY_BASIC_ENABLED
+          value: "false"
+        - name: MANAGEMENT_SECURITY_ENABLED
+          value: "false"
+        - name: EGOV_MDMS_HOST
+          valueFrom:
+            configMapKeyRef:
+              key: egov-mdms-service
+              name: egov-service-host
+        - name: EGOV_ENC_HOST
+          valueFrom:
+            configMapKeyRef:
+              key: egov-enc-service
+              name: egov-service-host
+        - name: EGOV_STATE_LEVEL_TENANT_ID
+          valueFrom:
+            configMapKeyRef:
+              key: egov-state-level-tenant-id
+              name: egov-config
+        - name: STATE_LEVEL_TENANT_ID
+          valueFrom:
+            configMapKeyRef:
+              key: egov-state-level-tenant-id
+              name: egov-config
+        - name: KAFKA_TOPIC_AUDIT
+          value: enc-report-audit-data
+        - name: SPRING_DATASOURCE_URL
+          valueFrom:
+            configMapKeyRef:
+              key: db-url
+              name: egov-config
+        - name: APP_TIMEZONE
+          valueFrom:
+            configMapKeyRef:
+              key: timezone
+              name: egov-config
+        - name: SPRING_DATASOURCE_USERNAME
+          valueFrom:
+            secretKeyRef:
+              key: username
+              name: db
+        - name: SPRING_DATASOURCE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: password
+              name: db
+        - name: SPRING_DATASOURCE_TOMCAT_INITIAL_SIZE
+          valueFrom:
+            configMapKeyRef:
+              key: spring-datasource-tomcat-initialSize
+              name: egov-config
+        - name: SERVER_TOMCAT_MAX_THREADS
+          valueFrom:
+            configMapKeyRef:
+              key: server-tomcat-max-threads
+              name: egov-config
+        - name: SERVER_TOMCAT_MAX_CONNECTIONS
+          valueFrom:
+            configMapKeyRef:
+              key: server-tomcat-max-connections
+              name: egov-config
+        - name: SPRING_DATASOURCE_TOMCAT_MAX_ACTIVE
+          valueFrom:
+            configMapKeyRef:
+              key: spring-datasource-tomcat-max-active
+              name: egov-config
+        - name: KAFKA_CONFIG_BOOTSTRAP_SERVER_CONFIG
+          valueFrom:
+            configMapKeyRef:
+              key: kafka-brokers
+              name: egov-config
+        - name: SPRING_KAFKA_BOOTSTRAP_SERVERS
+          valueFrom:
+            configMapKeyRef:
+              key: kafka-brokers
+              name: egov-config
+        - name: SPRING_JPA_SHOW_SQL
+          valueFrom:
+            configMapKeyRef:
+              key: spring-jpa-show-sql
+              name: egov-config
+        - name: JAEGER_SERVICE_NAME
+          value: report
+        - name: JAEGER_SAMPLER_TYPE
+          value: remote
+        - name: JAEGER_AGENT_HOST
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: status.hostIP
+        - name: JAEGER_AGENT_PORT
+          value: "6831"
+        - name: JAEGER_SAMPLER_MANAGER_HOST_PORT
+          value: $(JAEGER_AGENT_HOST):5778
+        image: upyogio/report:v1.3.5-64da31c86e-4
+        imagePullPolicy: IfNotPresent
+        lifecycle:
+          preStop:
+            exec:
+              command:
+              - sh
+              - -c
+              - sleep 10
+        livenessProbe:
+          failureThreshold: 5
+          httpGet:
+            path: /report/health
+            port: 8080
+            scheme: HTTP
+          initialDelaySeconds: 30
+          periodSeconds: 60
+          successThreshold: 1
+          timeoutSeconds: 3
+        name: report
+        ports:
+        - containerPort: 8080
+          name: http
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 5
+          httpGet:
+            path: /report/health
+            port: 8080
+            scheme: HTTP
+          initialDelaySeconds: 30
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 3
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /work-dir
+          name: workdir
+      dnsPolicy: ClusterFirst
+      initContainers:
+      - env:
+        - name: GIT_SYNC_REPO
+          value: git@github.com:upyog/upyog-configs
+        - name: GIT_SYNC_BRANCH
+          value: sandbox-2.0
+        - name: GIT_SYNC_DEPTH
+          value: "1"
+        - name: GIT_SYNC_ONE_TIME
+          value: "true"
+        - name: GIT_SYNC_SSH
+          value: "true"
+        - name: GIT_SYNC_ROOT
+          value: /work-dir
+        image: k8s.gcr.io/git-sync:v3.1.1
+        imagePullPolicy: IfNotPresent
+        name: git-sync
+        resources: {}
+        securityContext:
+          runAsUser: 65533
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /etc/git-secret
+          name: git-secret
+        - mountPath: /work-dir
+          name: workdir
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext:
+        fsGroup: 65533
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - name: git-secret
+        secret:
+          defaultMode: 288
+          secretName: git-creds
+      - emptyDir: {}
+        name: workdir
