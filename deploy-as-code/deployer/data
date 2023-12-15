@@ -1,0 +1,228 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: egov-data-uploader
+    group: core
+  name: egov-data-uploader
+  namespace: egov
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 0
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: egov-data-uploader
+      group: core
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 0
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+        deployment-timestamp: "20221206073959"
+      creationTimestamp: null
+      labels:
+        app: egov-data-uploader
+        group: core
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  app: egov-data-uploader
+                  group: core
+              topologyKey: failure-domain.beta.kubernetes.io/zone
+            weight: 100
+      containers:
+      - env:
+        - name: UPLOAD_JSON_PATH
+          value: file:///work-dir/configs/egov-uploader/billing-service.json
+        - name: SEARCH_YAML_PATH
+          value: https://raw.githubusercontent.com/egovernments/egov-services/master/core/egov-data-uploader/src/main/resources/citizen-data-upload.yml
+        - name: JAVA_OPTS
+          value: -Xmx192m -Xms192m
+        - name: SERVER_PORT
+          value: "8080"
+        - name: INTERNAL_FILE_FOLDER_PATH
+          value: /tmp
+        - name: PROPERTY_MODULE_NAME
+          value: property-upload
+        - name: PROPERTY_HOST
+          valueFrom:
+            configMapKeyRef:
+              key: pt-services-v2
+              name: egov-service-host
+        - name: PROPERTY_CREATE
+          value: pt-services-v2/property/_create
+        - name: BUSINESS_MODULE_HOST
+          valueFrom:
+            configMapKeyRef:
+              key: egov-services-fqdn-name
+              name: egov-config
+        - name: FILESTORE_HOST
+          valueFrom:
+            configMapKeyRef:
+              key: egov-filestore
+              name: egov-service-host
+        - name: SECURITY_BASIC_ENABLED
+          value: "false"
+        - name: MANAGEMENT_SECURITY_ENABLED
+          value: "false"
+        - name: TRACER_OPENTRACING_ENABLED
+          value: "true"
+        - name: SPRING_DATASOURCE_URL
+          valueFrom:
+            configMapKeyRef:
+              key: db-url
+              name: egov-config
+        - name: FLYWAY_ENABLED
+          value: "false"
+        - name: SPRING_FLYWAY_ENABLED
+          value: "false"
+        - name: MANAGEMENT_ENDPOINTS_WEB_BASE_PATH
+          value: /
+        - name: APP_TIMEZONE
+          valueFrom:
+            configMapKeyRef:
+              key: timezone
+              name: egov-config
+        - name: FLYWAY_URL
+          valueFrom:
+            configMapKeyRef:
+              key: db-url
+              name: egov-config
+        - name: SPRING_DATASOURCE_USERNAME
+          valueFrom:
+            secretKeyRef:
+              key: username
+              name: db
+        - name: SPRING_DATASOURCE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: password
+              name: db
+        - name: SPRING_DATASOURCE_TOMCAT_INITIAL_SIZE
+          valueFrom:
+            configMapKeyRef:
+              key: spring-datasource-tomcat-initialSize
+              name: egov-config
+        - name: SERVER_TOMCAT_MAX_THREADS
+          valueFrom:
+            configMapKeyRef:
+              key: server-tomcat-max-threads
+              name: egov-config
+        - name: SERVER_TOMCAT_MAX_CONNECTIONS
+          valueFrom:
+            configMapKeyRef:
+              key: server-tomcat-max-connections
+              name: egov-config
+        - name: SPRING_DATASOURCE_TOMCAT_MAX_ACTIVE
+          valueFrom:
+            configMapKeyRef:
+              key: spring-datasource-tomcat-max-active
+              name: egov-config
+        - name: SPRING_DATASOURCE_HIKARI_MAXIMUM-POOL-SIZE
+          valueFrom:
+            configMapKeyRef:
+              key: spring-datasource-tomcat-max-active
+              name: egov-config
+        - name: KAFKA_CONFIG_BOOTSTRAP_SERVER_CONFIG
+          valueFrom:
+            configMapKeyRef:
+              key: kafka-brokers
+              name: egov-config
+        - name: SPRING_KAFKA_BOOTSTRAP_SERVERS
+          valueFrom:
+            configMapKeyRef:
+              key: kafka-brokers
+              name: egov-config
+        - name: SPRING_JPA_SHOW_SQL
+          valueFrom:
+            configMapKeyRef:
+              key: spring-jpa-show-sql
+              name: egov-config
+        - name: JAEGER_SERVICE_NAME
+          value: egov-data-uploader
+        - name: JAEGER_SAMPLER_TYPE
+          value: remote
+        - name: JAEGER_AGENT_HOST
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: status.hostIP
+        - name: JAEGER_AGENT_PORT
+          value: "6831"
+        - name: JAEGER_SAMPLER_MANAGER_HOST_PORT
+          value: $(JAEGER_AGENT_HOST):5778
+        - name: TRACER_OPENTRACING_ENABLED
+          value: "true"
+        image: egovio/egov-data-uploader:7-uploader-demand-feature-44b0170
+        imagePullPolicy: IfNotPresent
+        lifecycle:
+          preStop:
+            exec:
+              command:
+              - sh
+              - -c
+              - sleep 10
+        name: egov-data-uploader
+        ports:
+        - containerPort: 8080
+          name: http
+          protocol: TCP
+        resources:
+          limits:
+            memory: 512Mi
+          requests:
+            memory: 512Mi
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /work-dir
+          name: workdir
+      dnsPolicy: ClusterFirst
+      initContainers:
+      - env:
+        - name: GIT_SYNC_REPO
+          value: git@github.com:egovernments/playground-rainmaker-customization
+        - name: GIT_SYNC_BRANCH
+          value: master
+        - name: GIT_SYNC_DEPTH
+          value: "1"
+        - name: GIT_SYNC_ONE_TIME
+          value: "true"
+        - name: GIT_SYNC_SSH
+          value: "true"
+        - name: GIT_SYNC_ROOT
+          value: /work-dir
+        image: k8s.gcr.io/git-sync:v3.1.1
+        imagePullPolicy: IfNotPresent
+        name: git-sync
+        resources: {}
+        securityContext:
+          runAsUser: 65533
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /etc/git-secret
+          name: git-secret
+        - mountPath: /work-dir
+          name: workdir
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext:
+        fsGroup: 65533
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - name: git-secret
+        secret:
+          defaultMode: 288
+          secretName: git-creds
+      - emptyDir: {}
+        name: workdir
+

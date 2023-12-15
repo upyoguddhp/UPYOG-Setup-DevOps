@@ -1,0 +1,359 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: egov-pg-service
+    group: core
+  name: egov-pg-service
+  namespace: egov
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: egov-pg-service
+      group: core
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 0
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+        deployment-timestamp: "20231030112012"
+      creationTimestamp: null
+      labels:
+        app: egov-pg-service
+        group: core
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  app: egov-pg-service
+                  group: core
+              topologyKey: failure-domain.beta.kubernetes.io/zone
+            weight: 100
+      containers:
+      - env:
+        - name: SPRING_KAFKA_CONSUMER_GROUP_ID
+          value: egov-pg-service
+        - name: SPRING_KAFKA_PRODUCER_KEY_SERIALIZER
+          value: org.apache.kafka.common.serialization.StringSerializer
+        - name: SPRING_KAFKA_PRODUCER_VALUE_SERIALIZER
+          value: org.springframework.kafka.support.serializer.JsonSerializer
+        - name: EGOV_IDGEN_HOST
+          valueFrom:
+            configMapKeyRef:
+              key: egov-idgen
+              name: egov-service-host
+        - name: EGOV_MDMS_HOST
+          valueFrom:
+            configMapKeyRef:
+              key: egov-mdms-service
+              name: egov-service-host
+        - name: EGOV_BILLINGSERVICE_HOST
+          valueFrom:
+            configMapKeyRef:
+              key: billing-service
+              name: egov-service-host
+        - name: EGOV_COLLECTIONSERVICE_HOST
+          valueFrom:
+            configMapKeyRef:
+              key: collection-services
+              name: egov-service-host
+        - name: NOTIFICATION_URL
+          valueFrom:
+            configMapKeyRef:
+              key: egov-services-fqdn-name
+              name: egov-config
+        - name: EGOV_BANKACCOUNTSERVICE_HOST
+          valueFrom:
+            configMapKeyRef:
+              key: egf-master
+              name: egov-service-host
+        - name: EGOV_BUSINESSDETAILSSERVICE_HOST
+          valueFrom:
+            configMapKeyRef:
+              key: egov-common-masters
+              name: egov-service-host
+        - name: AXIS_ACTIVE
+          value: "true"
+        - name: AXIS_CURRENCY
+          value: INR
+        - name: AXIS_MERCHANT_VPC_VERSION
+          value: "1"
+        - name: AXIS_MERCHANT_VPC_COMMAND_PAY
+          value: pay
+        - name: AXIS_MERCHANT_VPC_COMMAND_STATUS
+          value: queryDR
+        - name: AXIS_LOCALE
+          value: en_IN
+        - name: AXIS_URL_DEBIT
+          value: https://migs.mastercard.co.in/vpcpay
+        - name: AXIS_URL_STATUS
+          value: https://migs.mastercard.co.in/vpcdps
+        - name: AXIS_MERCHANT_ID
+          valueFrom:
+            secretKeyRef:
+              key: axismerchantid
+              name: egov-pg-service
+        - name: AXIS_MERCHANT_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              key: axismerchantsecret
+              name: egov-pg-service
+        - name: AXIS_MERCHANT_USER
+          valueFrom:
+            secretKeyRef:
+              key: axismerchantuser
+              name: egov-pg-service
+        - name: AXIS_MERCHANT_PWD
+          valueFrom:
+            secretKeyRef:
+              key: axismerchantpwd
+              name: egov-pg-service
+        - name: AXIS_MERCHANT_ACCESS_CODE
+          valueFrom:
+            secretKeyRef:
+              key: axismerchantaccesscode
+              name: egov-pg-service
+        - name: PAYGOV_ACTIVE
+          value: "true"
+        - name: PAYGOV_MESSAGETYPE
+          value: "0100"
+        - name: PAYGOV_CURRENCY
+          value: INR
+        - name: PAYGOV_MERCHANT_VPC_COMMAND_PAY
+          value: pay
+        - name: PAYGOV_MERCHANT_VPC_COMMAND_STATUS
+          value: queryDR
+        - name: PAYGOV_DATEFORMAT
+          value: dd-MM-yyyy HH:mm:SSS
+        - name: PAYGOV_GATEWAY_URL
+          value: https://pilot.surepay.ndml.in/SurePayPayment/sp/processRequest
+        - name: PAYGOV_GATEWAY_STATUS_URL
+          value: https://pilot.surepay.ndml.in/SurePayPayment/v1/queryPaymentStatus
+        - name: PAYGOV_GATEWAY_STATUS_URL_WITHIP
+          value: https://121.242.223.194/SurePayPayment/v1/queryPaymentStatus
+        - name: PAYGOV_CITIZEN_REDIRECT_DOMAIN_NAME
+          value: https://upyog.niua.org
+        - name: EGOV_DEFAULT_CITIZEN_URL
+          value: https://upyog-test.niua.org/citizen
+        - name: PAYGOV_REDIRECT_URL
+          value: https://upyog-test.niua.org/pg-service/transaction/v1/_redirect
+        - name: PAYGOV_MERCHANT_ID
+          valueFrom:
+            secretKeyRef:
+              key: paygov-merchant-id
+              name: egov-pg-service
+        - name: PAYGOV_MERCHANT_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              key: paygov-merchant-secret-key
+              name: egov-pg-service
+        - name: PAYGOV_MERCHANT_USER
+          valueFrom:
+            secretKeyRef:
+              key: paygov-merchant-user
+              name: egov-pg-service
+        - name: PAYGOV_MERCHANT_PWD
+          valueFrom:
+            secretKeyRef:
+              key: paygov-merchant-pwd
+              name: egov-pg-service
+        - name: NTTDATA_ACTIVE
+          value: "true"
+        - name: NTTDATA_MERCHANT_ID
+          value: "317156"
+        - name: NTTDATA_REDIRECT_URL
+          value: https://upyog-test.niua.org/pg-service/transaction/v1/_redirect
+        - name: NTTDATA_GATEWAY_URL_STATUS
+          value: https://paynetzuat.atomtech.in/ots/payment/status?
+        - name: NTTDATA_GATEWAY_URL_ATOM
+          value: https://paynetzuat.atomtech.in/ots/aipay/auth?
+        - name: NTTDATA_ORIGINAL_RETURN_URL_KEY
+          value: originalreturnurl
+        - name: NTTDATA_MERCHANT_CHECKOUT_HOST
+          value: https://pgtest.atomtech.in/staticdata/ots/js/atomcheckout.js
+        - name: JAVA_OPTS
+          value: -Xmx192m -Xms192m
+        - name: JAVA_ARGS
+          value: -Dspring.profiles.active=monitoring
+        - name: JAVA_ENABLE_DEBUG
+          value: "true"
+        - name: SERVER_PORT
+          value: "8080"
+        - name: SECURITY_BASIC_ENABLED
+          value: "false"
+        - name: MANAGEMENT_SECURITY_ENABLED
+          value: "false"
+        - name: TRACER_OPENTRACING_ENABLED
+          value: "true"
+        - name: TRACER_OPENTRACING_ENABLED
+          value: "true"
+        - name: SPRING_DATASOURCE_URL
+          valueFrom:
+            configMapKeyRef:
+              key: db-url
+              name: egov-config
+        - name: FLYWAY_ENABLED
+          value: "false"
+        - name: SPRING_FLYWAY_ENABLED
+          value: "false"
+        - name: MANAGEMENT_ENDPOINTS_WEB_BASE_PATH
+          value: /
+        - name: APP_TIMEZONE
+          valueFrom:
+            configMapKeyRef:
+              key: timezone
+              name: egov-config
+        - name: FLYWAY_URL
+          valueFrom:
+            configMapKeyRef:
+              key: db-url
+              name: egov-config
+        - name: SPRING_DATASOURCE_USERNAME
+          valueFrom:
+            secretKeyRef:
+              key: username
+              name: db
+        - name: SPRING_DATASOURCE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: password
+              name: db
+        - name: SPRING_DATASOURCE_TOMCAT_INITIAL_SIZE
+          valueFrom:
+            configMapKeyRef:
+              key: spring-datasource-tomcat-initialSize
+              name: egov-config
+        - name: SERVER_TOMCAT_MAX_THREADS
+          valueFrom:
+            configMapKeyRef:
+              key: server-tomcat-max-threads
+              name: egov-config
+        - name: SERVER_TOMCAT_MAX_CONNECTIONS
+          valueFrom:
+            configMapKeyRef:
+              key: server-tomcat-max-connections
+              name: egov-config
+        - name: SPRING_DATASOURCE_TOMCAT_MAX_ACTIVE
+          valueFrom:
+            configMapKeyRef:
+              key: spring-datasource-tomcat-max-active
+              name: egov-config
+        - name: SPRING_DATASOURCE_HIKARI_MAXIMUM-POOL-SIZE
+          valueFrom:
+            configMapKeyRef:
+              key: spring-datasource-tomcat-max-active
+              name: egov-config
+        - name: KAFKA_CONFIG_BOOTSTRAP_SERVER_CONFIG
+          valueFrom:
+            configMapKeyRef:
+              key: kafka-brokers
+              name: egov-config
+        - name: SPRING_KAFKA_BOOTSTRAP_SERVERS
+          valueFrom:
+            configMapKeyRef:
+              key: kafka-brokers
+              name: egov-config
+        - name: SPRING_JPA_SHOW_SQL
+          valueFrom:
+            configMapKeyRef:
+              key: spring-jpa-show-sql
+              name: egov-config
+        - name: JAEGER_SERVICE_NAME
+          value: egov-pg-service
+        - name: JAEGER_SAMPLER_TYPE
+          value: remote
+        - name: JAEGER_AGENT_HOST
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: status.hostIP
+        - name: JAEGER_AGENT_PORT
+          value: "6831"
+        - name: JAEGER_SAMPLER_MANAGER_HOST_PORT
+          value: $(JAEGER_AGENT_HOST):5778
+        image: upyogio/egov-pg-service:Dev-2.0-2677273565-38
+        imagePullPolicy: IfNotPresent
+        lifecycle:
+          preStop:
+            exec:
+              command:
+              - sh
+              - -c
+              - sleep 10
+        livenessProbe:
+          failureThreshold: 5
+          httpGet:
+            path: /pg-service/health
+            port: 8080
+            scheme: HTTP
+          initialDelaySeconds: 30
+          periodSeconds: 60
+          successThreshold: 1
+          timeoutSeconds: 3
+        name: egov-pg-service
+        ports:
+        - containerPort: 8080
+          name: http
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 5
+          httpGet:
+            path: /pg-service/health
+            port: 8080
+            scheme: HTTP
+          initialDelaySeconds: 30
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 3
+        resources:
+          limits:
+            memory: 512Mi
+          requests:
+            memory: 512Mi
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      initContainers:
+      - env:
+        - name: DB_URL
+          valueFrom:
+            configMapKeyRef:
+              key: db-url
+              name: egov-config
+        - name: SCHEMA_TABLE
+          value: egov_pg_service_schema
+        - name: FLYWAY_USER
+          valueFrom:
+            secretKeyRef:
+              key: flyway-username
+              name: db
+        - name: FLYWAY_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: flyway-password
+              name: db
+        - name: FLYWAY_LOCATIONS
+          valueFrom:
+            configMapKeyRef:
+              key: flyway-locations
+              name: egov-config
+        image: upyogio/egov-pg-service-db:Dev-2.0-2677273565-38
+        imagePullPolicy: IfNotPresent
+        name: db-migration
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+

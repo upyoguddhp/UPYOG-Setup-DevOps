@@ -1,0 +1,244 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: egov-filestore
+    group: core
+  name: egov-filestore
+  namespace: egov
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: egov-filestore
+      group: core
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+        deployment-timestamp: "20230529041527"
+      creationTimestamp: null
+      labels:
+        app: egov-filestore
+        group: core
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  app: egov-filestore
+                  group: core
+              topologyKey: failure-domain.beta.kubernetes.io/zone
+            weight: 100
+      containers:
+      - env:
+        - name: SERVER_PORT
+          value: "8080"
+        - name: SECURITY_BASIC_ENABLED
+          value: "false"
+        - name: MANAGEMENT_SECURITY_ENABLED
+          value: "false"
+        - name: FILE_STORAGE_MOUNT_PATH
+          value: /filestore
+        - name: TEMP_FOLDER_PATH
+          value: /tmp
+        - name: SPRING_SERVLET_MULTIPART_MAX_FILE_SIZE
+          value: 200MB
+        - name: ISNFSSTORAGEENABLED
+          value: "false"
+        - name: ISS3ENABLED
+          value: "true"
+        - name: ISS3ENABLED
+          value: "true"
+        - name: AWS_KEY
+          valueFrom:
+            secretKeyRef:
+              key: awskey
+              name: egov-filestore
+        - name: AWS_SECRETKEY
+          valueFrom:
+            secretKeyRef:
+              key: awssecretkey
+              name: egov-filestore
+        - name: IS_BUCKET_FIXED
+          value: "true"
+        - name: FIXED_BUCKETNAME
+          value: upyog-test-assets
+        - name: JAVA_OPTS
+          value: -Xmx192m -Xms192m
+        - name: ALLOWED_FORMATS_MAP
+          value: '{jpg:{''image/jpg'',''image/jpeg''},jpeg:{''image/jpeg'',''image/jpg''},png:{''image/png''},pdf:{''application/pdf''},odt:{''application/vnd.oasis.opendocument.text''},ods:{''application/vnd.oasis.opendocument.spreadsheet''},docx:{''application/x-tika-msoffice'',''application/x-tika-ooxml'',''application/vnd.oasis.opendocument.text''},doc:{''application/x-tika-msoffice'',''application/x-tika-ooxml'',''application/vnd.oasis.opendocument.text''},dxf:{''text/plain'',''application/octet-stream'',''image/vnd.dxf'',''image/vnd.dxf;
+            format=ascii'',''image/vnd.dxf; format=binary'',''image/vnd.dxb''},csv:{''text/plain''},txt:{''text/plain''}}'
+        - name: PRESIGNED_URL_EXPIRY_TIME_IN_SECS
+          value: "3600"
+        - name: SPRING_DATASOURCE_URL
+          valueFrom:
+            configMapKeyRef:
+              key: db-url
+              name: egov-config
+        - name: FLYWAY_ENABLED
+          value: "false"
+        - name: SPRING_FLYWAY_ENABLED
+          value: "false"
+        - name: MANAGEMENT_ENDPOINTS_WEB_BASE_PATH
+          value: /
+        - name: APP_TIMEZONE
+          valueFrom:
+            configMapKeyRef:
+              key: timezone
+              name: egov-config
+        - name: FLYWAY_URL
+          valueFrom:
+            configMapKeyRef:
+              key: db-url
+              name: egov-config
+        - name: SPRING_DATASOURCE_USERNAME
+          valueFrom:
+            secretKeyRef:
+              key: username
+              name: db
+        - name: SPRING_DATASOURCE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: password
+              name: db
+        - name: SPRING_DATASOURCE_TOMCAT_INITIAL_SIZE
+          valueFrom:
+            configMapKeyRef:
+              key: spring-datasource-tomcat-initialSize
+              name: egov-config
+        - name: SERVER_TOMCAT_MAX_THREADS
+          valueFrom:
+            configMapKeyRef:
+              key: server-tomcat-max-threads
+              name: egov-config
+        - name: SERVER_TOMCAT_MAX_CONNECTIONS
+          valueFrom:
+            configMapKeyRef:
+              key: server-tomcat-max-connections
+              name: egov-config
+        - name: SPRING_DATASOURCE_TOMCAT_MAX_ACTIVE
+          valueFrom:
+            configMapKeyRef:
+              key: spring-datasource-tomcat-max-active
+              name: egov-config
+        - name: SPRING_DATASOURCE_HIKARI_MAXIMUM-POOL-SIZE
+          valueFrom:
+            configMapKeyRef:
+              key: spring-datasource-tomcat-max-active
+              name: egov-config
+        - name: KAFKA_CONFIG_BOOTSTRAP_SERVER_CONFIG
+          valueFrom:
+            configMapKeyRef:
+              key: kafka-brokers
+              name: egov-config
+        - name: SPRING_KAFKA_BOOTSTRAP_SERVERS
+          valueFrom:
+            configMapKeyRef:
+              key: kafka-brokers
+              name: egov-config
+        - name: SPRING_JPA_SHOW_SQL
+          valueFrom:
+            configMapKeyRef:
+              key: spring-jpa-show-sql
+              name: egov-config
+        - name: JAEGER_SERVICE_NAME
+          value: egov-filestore
+        - name: JAEGER_SAMPLER_TYPE
+          value: remote
+        - name: JAEGER_AGENT_HOST
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: status.hostIP
+        - name: JAEGER_AGENT_PORT
+          value: "6831"
+        - name: JAEGER_SAMPLER_MANAGER_HOST_PORT
+          value: $(JAEGER_AGENT_HOST):5778
+        - name: TRACER_OPENTRACING_ENABLED
+          value: "true"
+        image: upyogio/egov-filestore:dev-5dbbcb807b-3
+        imagePullPolicy: IfNotPresent
+        lifecycle:
+          preStop:
+            exec:
+              command:
+              - sh
+              - -c
+              - sleep 10
+        livenessProbe:
+          failureThreshold: 5
+          httpGet:
+            path: /filestore/health
+            port: 8080
+            scheme: HTTP
+          initialDelaySeconds: 30
+          periodSeconds: 60
+          successThreshold: 1
+          timeoutSeconds: 3
+        name: egov-filestore
+        ports:
+        - containerPort: 8080
+          name: http
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 5
+          httpGet:
+            path: /filestore/health
+            port: 8080
+            scheme: HTTP
+          initialDelaySeconds: 30
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 3
+        resources:
+          limits:
+            memory: 512Mi
+          requests:
+            memory: 512Mi
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      initContainers:
+      - env:
+        - name: DB_URL
+          valueFrom:
+            configMapKeyRef:
+              key: db-url
+              name: egov-config
+        - name: SCHEMA_TABLE
+          value: egov_filestore_schema
+        - name: FLYWAY_USER
+          valueFrom:
+            secretKeyRef:
+              key: flyway-username
+              name: db
+        - name: FLYWAY_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: flyway-password
+              name: db
+        - name: FLYWAY_LOCATIONS
+          valueFrom:
+            configMapKeyRef:
+              key: flyway-locations
+              name: egov-config
+        image: upyogio/egov-filestore-db:dev-5dbbcb807b-3
+        imagePullPolicy: IfNotPresent
+        name: db-migration
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+

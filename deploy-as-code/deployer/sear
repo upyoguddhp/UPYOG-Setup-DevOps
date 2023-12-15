@@ -1,0 +1,215 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: egov-searcher
+    group: core
+  name: egov-searcher
+  namespace: egov
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: egov-searcher
+      group: core
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 0
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+        deployment-timestamp: "20230529041554"
+      creationTimestamp: null
+      labels:
+        app: egov-searcher
+        group: core
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  app: egov-searcher
+                  group: core
+              topologyKey: failure-domain.beta.kubernetes.io/zone
+            weight: 100
+      containers:
+      - env:
+        - name: SEARCH_YAML_PATH
+          value: file:///work-dir/upyog-configs/configs/egov-searcher/rainmaker-pgr-v2.yml,file:///work-dir/upyog-configs/configs/egov-searcher/weekly-impact-emailer-searcher.yml,file:///work-dir/upyog-configs/configs/egov-searcher/PTDemandBasedSearcher.yml,file:///work-dir/upyog-configs/configs/egov-searcher/bill-genie.yml,file:///work-dir/upyog-configs/configs/egov-searcher/rainmaker-tl.yml,file:///work-dir/upyog-configs/configs/egov-searcher/localitySearcher.yml,file:///work-dir/upyog-configs/configs/egov-searcher/propertyopensearch.yml,file:///work-dir/upyog-configs/configs/egov-searcher/inboxpropertysearch.yml,file:///work-dir/upyog-configs/configs/egov-searcher/wateropensearch.yml,file:///work-dir/upyog-configs/configs/egov-searcher/sewerageopensearch.yml,file:///work-dir/upyog-configs/configs/egov-searcher/inboxTLSearch.yml,file:///work-dir/upyog-configs/configs/egov-searcher/inboxFSMSearch.yml,file:///work-dir/upyog-configs/configs/egov-searcher/inboxNOCSearch.yml,file:///work-dir/upyog-configs/configs/egov-searcher/inboxBPASearch.yml,file:///work-dir/upyog-configs/configs/egov-searcher/inboxBillAmendmentWsSearch.yml,file:///work-dir/upyog-configs/configs/egov-searcher/inboxBillAmendmentSwSearch.yml
+        - name: JAVA_OPTS
+          value: -Xmx192m -Xms192m
+        - name: SERVER_PORT
+          value: "8080"
+        - name: SECURITY_BASIC_ENABLED
+          value: "false"
+        - name: MANAGEMENT_SECURITY_ENABLED
+          value: "false"
+        - name: EGOV_MDMS_HOST
+          valueFrom:
+            configMapKeyRef:
+              key: egov-mdms-service
+              name: egov-service-host
+        - name: STATE_LEVEL_TENANT_ID
+          valueFrom:
+            configMapKeyRef:
+              key: egov-state-level-tenant-id
+              name: egov-config
+        - name: TRACER_OPENTRACING_ENABLED
+          value: "true"
+        - name: TRACER_OPENTRACING_ENABLED
+          value: "true"
+        - name: SPRING_DATASOURCE_URL
+          valueFrom:
+            configMapKeyRef:
+              key: db-url
+              name: egov-config
+        - name: FLYWAY_ENABLED
+          value: "false"
+        - name: SPRING_FLYWAY_ENABLED
+          value: "false"
+        - name: MANAGEMENT_ENDPOINTS_WEB_BASE_PATH
+          value: /
+        - name: APP_TIMEZONE
+          valueFrom:
+            configMapKeyRef:
+              key: timezone
+              name: egov-config
+        - name: FLYWAY_URL
+          valueFrom:
+            configMapKeyRef:
+              key: db-url
+              name: egov-config
+        - name: SPRING_DATASOURCE_USERNAME
+          valueFrom:
+            secretKeyRef:
+              key: username
+              name: db
+        - name: SPRING_DATASOURCE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: password
+              name: db
+        - name: SPRING_DATASOURCE_TOMCAT_INITIAL_SIZE
+          valueFrom:
+            configMapKeyRef:
+              key: spring-datasource-tomcat-initialSize
+              name: egov-config
+        - name: SERVER_TOMCAT_MAX_THREADS
+          valueFrom:
+            configMapKeyRef:
+              key: server-tomcat-max-threads
+              name: egov-config
+        - name: SERVER_TOMCAT_MAX_CONNECTIONS
+          valueFrom:
+            configMapKeyRef:
+              key: server-tomcat-max-connections
+              name: egov-config
+        - name: SPRING_DATASOURCE_TOMCAT_MAX_ACTIVE
+          valueFrom:
+            configMapKeyRef:
+              key: spring-datasource-tomcat-max-active
+              name: egov-config
+        - name: SPRING_DATASOURCE_HIKARI_MAXIMUM-POOL-SIZE
+          valueFrom:
+            configMapKeyRef:
+              key: spring-datasource-tomcat-max-active
+              name: egov-config
+        - name: KAFKA_CONFIG_BOOTSTRAP_SERVER_CONFIG
+          valueFrom:
+            configMapKeyRef:
+              key: kafka-brokers
+              name: egov-config
+        - name: SPRING_KAFKA_BOOTSTRAP_SERVERS
+          valueFrom:
+            configMapKeyRef:
+              key: kafka-brokers
+              name: egov-config
+        - name: SPRING_JPA_SHOW_SQL
+          valueFrom:
+            configMapKeyRef:
+              key: spring-jpa-show-sql
+              name: egov-config
+        - name: JAEGER_SERVICE_NAME
+          value: egov-searcher
+        - name: JAEGER_SAMPLER_TYPE
+          value: remote
+        - name: JAEGER_AGENT_HOST
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: status.hostIP
+        - name: JAEGER_AGENT_PORT
+          value: "6831"
+        - name: JAEGER_SAMPLER_MANAGER_HOST_PORT
+          value: $(JAEGER_AGENT_HOST):5778
+        image: upyogio/egov-searcher:dev-e059032c9e-3
+        imagePullPolicy: IfNotPresent
+        lifecycle:
+          preStop:
+            exec:
+              command:
+              - sh
+              - -c
+              - sleep 10
+        name: egov-searcher
+        ports:
+        - containerPort: 8080
+          name: http
+          protocol: TCP
+        resources:
+          limits:
+            memory: 512Mi
+          requests:
+            memory: 512Mi
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /work-dir
+          name: workdir
+      dnsPolicy: ClusterFirst
+      initContainers:
+      - env:
+        - name: GIT_SYNC_REPO
+          value: git@github.com:upyog/upyog-configs
+        - name: GIT_SYNC_BRANCH
+          value: Dev-2.0
+        - name: GIT_SYNC_DEPTH
+          value: "1"
+        - name: GIT_SYNC_ONE_TIME
+          value: "true"
+        - name: GIT_SYNC_SSH
+          value: "true"
+        - name: GIT_SYNC_ROOT
+          value: /work-dir
+        image: k8s.gcr.io/git-sync:v3.1.1
+        imagePullPolicy: IfNotPresent
+        name: git-sync
+        resources: {}
+        securityContext:
+          runAsUser: 65533
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /etc/git-secret
+          name: git-secret
+        - mountPath: /work-dir
+          name: workdir
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext:
+        fsGroup: 65533
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - name: git-secret
+        secret:
+          defaultMode: 288
+          secretName: git-creds
+      - emptyDir: {}
+        name: workdir
+
