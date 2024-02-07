@@ -1,1 +1,0 @@
-# UPYOG-Training-DevOps
