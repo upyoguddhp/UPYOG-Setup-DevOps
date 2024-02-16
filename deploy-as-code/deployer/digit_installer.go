@@ -64,8 +64,8 @@ func main() {
 	var argStr string = ""
 	var releaseChartDir string = "../../config-as-code/product-release-charts/"
 
-	fmt.Println(string(Green), "\n*******  Welcome to DIGIT INSTALLATION!!! Please ensure the Pre-requsites before you proceed *********\n")
-	const sPreReq = "\bPre-requsites (Please Read Carefully):\n\tDIGIT Platform is a combination of multiple microservices that are packaged as docker containers that can be run on any supported infra like dockercompose, kubernetes, etc. Here we'll have a setup baselined for kubernetes.\nHence the following are mandatory to have it before you proceed.\n\t1. Kubernetes(K8s) Cluster.\n\t\t[a] Local: If you do not have k8s, using this link you can create k8s cluster on your local or on a VM.\n\t\t[b] Cloud: If you have your cloud account like AWS, Azure, GCP, SDC or NIC you can follow this link to create k8s.\n\t2. Post the k8s cluster creation you should get the Kubeconfig file, which you have saved in your local machine.\n\t3. Helm installed on your local, follow this link to install\n\t4. Target Env Deployment config file, refer here for the sample template and fill your env specific values.\n\t5. If you want to use encrypted values instead of plain-text for your sensitive configuration, install sops by using this link.\n\nWell! We are good to get started when all the above pre-requistes are met, if not abort it here (Ctl+c) set-it up, come back and rerun the script."
+	fmt.Println(string(Green), "\n*******  Welcome to UPYOG INSTALLATION!!! Please ensure the Pre-requsites before you proceed *********\n")
+	const sPreReq = "\bPre-requsites (Please Read Carefully):\n\tUPYOG Platform is a combination of multiple microservices that are packaged as docker containers that can be run on any supported infra like dockercompose, kubernetes, etc. Here we'll have a setup baselined for kubernetes.\nHence the following are mandatory to have it before you proceed.\n\t1. Kubernetes(K8s) Cluster.\n\t\t[a] Local: If you do not have k8s, using this link you can create k8s cluster on your local or on a VM.\n\t\t[b] Cloud: If you have your cloud account like AWS, Azure, GCP, SDC or NIC you can follow this link to create k8s.\n\t2. Post the k8s cluster creation you should get the Kubeconfig file, which you have saved in your local machine.\n\t3. Helm installed on your local, follow this link to install\n\t4. Target Env Deployment config file, refer here for the sample template and fill your env specific values.\n\t5. If you want to use encrypted values instead of plain-text for your sensitive configuration, install sops by using this link.\n\nWell! We are good to get started when all the above pre-requistes are met, if not abort it here (Ctl+c) set-it up, come back and rerun the script."
 	// Get the Proceedual of the user
 	fmt.Println(string(Cyan), sPreReq)
 	//var proceedQuestion string
@@ -125,7 +125,7 @@ func main() {
 						}
 					}
 					modules = append(modules, "Exit")
-					result, err := sel(modules, "Select the DIGIT modules that you want to install, choose Exit to complete selection")
+					result, err := sel(modules, "Select the UPYOG modules that you want to install, choose Exit to complete selection")
 					//if err == nil {
 					for result != "Exit" && err == nil {
 						selectedMod = append(selectedMod, result)
