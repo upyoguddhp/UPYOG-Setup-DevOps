@@ -21,6 +21,6 @@ db_username: "demo"
 domain_name: "demo.upyog.org"
 
 # Replace with the name you want to give to your S3 bucket which is used to store the terraform state
-terraform_state_bucket_name: "digit-terraform"
+terraform_state_bucket_name: "upyog-terraform"
 
 
