@@ -39,9 +39,7 @@ modules:
         - upyogio/egov-workflow-v2:v1.2.2-ed4fe46f5c-5
         - upyogio/pdf-service:v1.2.1-2fa4dd1333-21
         - upyogio/report:v1.3.5-2fa4dd1333-6
-        - egovio/xstate-chatbot:v1.1.1-96b24b0d72-21
-        - egovio/egov-user-chatbot:v1.2.6-96b24b0d72-4 
-        - egovio/playground:1.0
+        - upyogio/playground:1.0
     - name: business
       dependencies:
         - "core"
@@ -57,7 +55,7 @@ modules:
       dependencies:
         - "core"
       services:
-        - egovio/egov-custom-consumer:v1.1.1-72f8a8f87b-3
+        - upyogio/egov-custom-consumer:v1.1.1-72f8a8f87b-3
         - upyogio/egov-pdf:v1.2.0-2fa4dd1333-35
     - name: "frontend"             
       dependencies:
