@@ -182,7 +182,7 @@ type Quickstart struct {
 
 func DeployConfig(Config map[string]interface{}, kvids []string, zvids []string, esdids []string, esmids []string, modules []string, smsproceed string, fileproceed string, botproceed string, flag string) {
 
-	file, err := ioutil.ReadFile("DIGIT-DevOps/config-as-code/environments/egov-demo.yaml")
+	file, err := ioutil.ReadFile("DIGIT-DevOps/config-as-code/environments/upyog-demo.yaml")
 	if err != nil {
 		log.Printf("%v", err)
 	}
@@ -1286,7 +1286,7 @@ func DeployConfig(Config map[string]interface{}, kvids []string, zvids []string,
 
 func SecretFile(cluster_name string,Ssh string,SecretConfig map[string]string) {
 	var sec Secret
-	secret, err := ioutil.ReadFile("DIGIT-DevOps/config-as-code/environments/egov-demo-secrets.yaml")
+	secret, err := ioutil.ReadFile("DIGIT-DevOps/config-as-code/environments/upyog-demo-secrets.yaml")
 	if err != nil {
 		log.Printf("%v", err)
 	}
