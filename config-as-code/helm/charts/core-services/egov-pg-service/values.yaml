@@ -64,6 +64,11 @@ env: |
       configMapKeyRef:
         name: egov-service-host
         key: billing-service
+  - name: EGOV_USERSERVICE_HOST
+    valueFrom:
+      configMapKeyRef:
+        key: egov-user
+        name: egov-service-host        
   - name: EGOV_COLLECTIONSERVICE_HOST
     valueFrom:
       configMapKeyRef:
