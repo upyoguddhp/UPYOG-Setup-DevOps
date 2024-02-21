@@ -73,7 +73,7 @@ modules:
         - upyogio/citizen:v1.10.0-beta-3f2fe9abc7-10
         - upyogio/employee:v1.10.0-beta-3f2fe9abc7-17
         - upyogio/digit-ui:v1.7.0-beta.2-cf0dafd7b8-405
-        - upyogio/zuul:master-030523-3bec05ca71-8     
+        - upyogio/zuul:master-030523-3bec05ca71-8
     - name: m_property-tax    #PT
       dependencies:
         - "core"
@@ -82,7 +82,7 @@ modules:
         - upyogio/property-services:v1.2.1-7cf1e0e1e3-59
         - upyogio/pt-calculator-v2:v1.1.5_beta-88379920df-33
         - upyogio/pt-services-v2:v1.0.0-1a3c54d970-8
-        - upyogio/zuul:master-030523-3bec05ca71-8     
+        - upyogio/zuul:master-030523-3bec05ca71-8
     - name: m_trade-license    #TL
       dependencies:
           - "core"
@@ -90,4 +90,4 @@ modules:
       services:
         - upyogio/tl-calculator:v1.1.5-64da31c86e-6
         - upyogio/tl-services:v1.1.8-64da31c86e-7   
-        - upyogio/zuul:master-030523-3bec05ca71-8     
+        - upyogio/zuul:master-030523-3bec05ca71-8
