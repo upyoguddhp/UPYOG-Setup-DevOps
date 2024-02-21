@@ -304,11 +304,11 @@ egov-data-uploader:
       branch: "UAT"                                    ##### Change repo branch with Your fork Repo branch
 
 egov-searcher:
-  search-yaml-path: "file:///work-dir/configs/egov-searcher/rainmaker-pgr-v2.yml,file:///work-dir/configs/egov-searcher/weekly-impact-emailer-searcher.yml,file:///work-dir/configs/egov-searcher/PTDemandBasedSearcher.yml,file:///work-dir/configs/egov-searcher/bill-genie.yml,file:///work-dir/configs/egov-searcher/rainmaker-tl.yml,file:///work-dir/configs/egov-searcher/localitySearcher.yml"
+  search-yaml-path: "file:///work-dir/upyog-configs/configs/egov-searcher/rainmaker-pgr-v2.yml,file:///work-dir/upyog-configs/configs/egov-searcher/weekly-impact-emailer-searcher.yml,file:///work-dir/upyog-configs/configs/egov-searcher/PTDemandBasedSearcher.yml,file:///work-dir/upyog-configs/configs/egov-searcher/bill-genie.yml,file:///work-dir/upyog-configs/configs/egov-searcher/rainmaker-tl.yml,file:///work-dir/upyog-configs/configs/egov-searcher/localitySearcher.yml"
   initContainers:
     gitSync:
-      repo: "git@github.com:egovernments/configs"     ##### Change repo url with Your fork Repo url
-      branch: "UAT"                                   ##### Change repo branch with Your fork Repo branch
+      repo: "git@github.com:upyog/upyog-configs"     ##### Change repo url with Your fork Repo url
+      branch: "2.1"                                   ##### Change repo branch with Your fork Repo branch
 
 dashboard-analytics:
   config-schema-paths: "file:///work-dir/configs/egov-dss-dashboards/dashboard-analytics/*.json"
