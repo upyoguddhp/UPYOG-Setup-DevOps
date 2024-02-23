@@ -160,8 +160,7 @@ resource "aws_eks_addon" "core_dns" {
 }
 resource "aws_eks_addon" "aws_ebs_csi_driver" {
   cluster_name      = data.aws_eks_cluster.cluster.name
-  addon_name        = "aws-ebs-csi-driver"
-  addon_version     = "v1.23.1-eksbuild.1"
+  addon_name        = "aws-ebs-csi-driver"  
   resolve_conflicts = "OVERWRITE"
 }
 
