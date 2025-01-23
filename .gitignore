@@ -1,1 +1,2 @@
 /config-as-code/environments/upyog-demo-secrets.yaml
+/infra-as-code/terraform/sample-aws/.terraform/*
