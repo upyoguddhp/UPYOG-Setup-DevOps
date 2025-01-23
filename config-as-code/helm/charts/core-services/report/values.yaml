@@ -46,7 +46,31 @@ env: |
   - name: SECURITY_BASIC_ENABLED
     value: "false"  
   - name: MANAGEMENT_SECURITY_ENABLED
-    value: "false"  
+    value: "false"
+  - name: SPRING_THYMELEAF_SUFFIX
+    value: ".html"
+  - name: SPRING_THYMELEAF_PREFIX
+    value: "${configs.basePath}/pdf-services/format-configs/"
+  - name: SPRING_THYMELEAF_ENCODING
+    value: "UTF-8"
+  - name: SPRING_THYMELEAF_CONTENT_TYPE
+    value: "text/html"
+  - name: SPRING_THYMELEAF_MODE
+    value: "HTML5"
+  - name: SPRING_THYMELEAF_CACHE
+    value: "false"
+  - name: CONFIGS_BASEPATH
+    value: "file:///work-dir/upyog-configs.git/configs/reports/bpa-configs"
+  - name: NAME_USERNAME_COMBINEDREPORTS_LIST
+    value: "ObpsDailyCollectionReport,TradeLicenseDailyCollectionReport"
+  - name: HPUDD_PDF_SERVICES_DATA_CONFIGS_PATH
+    value: "${configs.basePath}/pdf-services/data-configs/"
+  - name: HPUDD_PDF_SERVICES_KARLA_FONT_PATH
+    value: "${configs.basePath}/pdf-services/fonts/Karla-Regular.ttf"
+  - name: SPRING_RESOURCES_CACHE_PERIOD
+    value: "1s"
+  - name: HPUDD_LOGO_V2_PATH
+    value: "${configs.basePath}/pdf-services/format-configs/Hpudd_Logo.jpg"
   - name: EGOV_MDMS_HOST
     valueFrom:
       configMapKeyRef:

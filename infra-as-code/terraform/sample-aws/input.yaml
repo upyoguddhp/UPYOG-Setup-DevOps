@@ -1,26 +1,26 @@
 # Replace with the name which you want to give to your EKS cluster
 # Cluster name can have only lowercase alphanumeric characters and hyphens
 # For example: "upyog-demo"
-cluster_name: "demo"
+cluster_name: "hp-udd-prod"
 
 # Replace with ssh key name you want
-ssh_key_name: "demo-ssh-key" 
+ssh_key_name: "hp-udd-key2" 
 
 # Replace with public key which you want to add in your EC2 machines # ssh key which you want to add in your EC2 machines
-public_ssh_key: "ssh-rsa zxyzxyzxyzxyzxyzxyzxyzxyzxyzxyzxyzxyzxyzxyzxyzxyzxyzxyzxyzxyzxyzxyzxyzxyzxyzxyzxyzxyzxyzxyzxyzxyzxyzxyzxyzxy"
+public_ssh_key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDC6xc6OR0ulATOjug//wJYj3Ajjpz09H8HhN4dl4cFpqFlYpx1PjE291yTjHO7BTHM6I/GYHFPkdNVv92E73N7EQKEcEMblJ+wCa3EV/PC2uQaDEAvQvhlQgx3ZZ635qvbRD3sPPPzwGYNcgnJctDjSg6W0GjCuXxLZHW6Sl7enOkT6gBAGPjhYmSy9Qnaoi056y56t1sETfik+0TCTsafJ9noeUprmJLf8HRZfvEX5YYX/gkBUgHJXmBz1zWw9AQsv9YHqEP/3YO/lI+Co6UsdDUKz6ODEa1Iqrdq/vRw8LZ+1+65qzcLODtyxXwETUIn9i9TlCClWHbgrjON501Z svchaudhari.ext@INPUNSVCHAUDHAR"
 
 # Name you want to give to your Database
 # DB name must contain only alphanumeric characters
-db_name: "demo"
+db_name: "hp_udd_prod"
 
 # Replace with DB username you want
 # DB user name must contain only alphanumeric characters
-db_username: "demo" 
+db_username: "postgres" 
 
 # Replace with Domain name you want for your web applications
-domain_name: "demo.upyog.org"
+domain_name: "citizenseva.hp.gov.in"
 
 # Replace with the name you want to give to your S3 bucket which is used to store the terraform state
-terraform_state_bucket_name: "upyog-terraform"
+terraform_state_bucket_name: "hp-udd-2"
 
 

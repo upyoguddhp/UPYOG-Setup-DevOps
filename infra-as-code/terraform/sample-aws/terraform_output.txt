@@ -1,0 +1,69 @@
+cluster_endpoint = "https://BFCC86EDEEC35A24D7A611D64C581C03.yl4.ap-south-1.eks.amazonaws.com"
+db_instance_endpoint = "hp-udd-prod-db.cbm06cyisapf.ap-south-1.rds.amazonaws.com:5432"
+db_instance_name = "hp_udd_prod"
+db_instance_port = 5432
+db_instance_username = <sensitive>
+es_data_volume_ids = [
+  "vol-000a4d289c8d29d25",
+  "vol-0be84bdc55714b994",
+  "vol-0f5dbd36b473d6a6c",
+]
+es_master_volume_ids = [
+  "vol-001c892474a1a90f5",
+  "vol-0c7697f0e895e5719",
+  "vol-0ef83e2857c0a6409",
+]
+kafka_vol_ids = [
+  "vol-0583fe8fbf0e15807",
+  "vol-0d18774736689665b",
+  "vol-08ad6988ff20f5365",
+]
+kubectl_config = <<EOT
+apiVersion: v1
+preferences: {}
+kind: Config
+
+clusters:
+- cluster:
+    server: https://BFCC86EDEEC35A24D7A611D64C581C03.yl4.ap-south-1.eks.amazonaws.com
+    certificate-authority-data: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURCVENDQWUyZ0F3SUJBZ0lJTGxHRWg4NTBsS0l3RFFZSktvWklodmNOQVFFTEJRQXdGVEVUTUJFR0ExVUUKQXhNS2EzVmlaWEp1WlhSbGN6QWVGdzB5TkRFeE1UVXdORE01TkRWYUZ3MHpOREV4TVRNd05EUTBORFZhTUJVeApFekFSQmdOVkJBTVRDbXQxWW1WeWJtVjBaWE13Z2dFaU1BMEdDU3FHU0liM0RRRUJBUVVBQTRJQkR3QXdnZ0VLCkFvSUJBUURPeXhSOWVwaWpxR1QrM3FEWmJQRWZBeXk0WHExZVhEdWFwMXJ1Y2dQcU9QU1hBMlFIRXlYeEUvMjIKVVkvWDR5cjByN1JzWG0vVmR3TkFNcDNmclNlbzRaRHJjNGZLYUVmN2ZqZWphVG1VemN0V1Vwb2pkMDExcXBIaQpVc0ROTkg3VlpnbkZXdnh4QmEvcXdPSHQwRGpvd0VWd040Wk9iV0UyYmVNQmJTZ0JUaXhGeTdPQ09penFSczk1CmhsN1NaWkNKTWMzbWFnM0NRUk9iaGZYeFFGdUZvYm40VXN0bG01M0YxN3kzMFJqZE1kaGhQMno0clhUV0NiT0YKLzd5WFluUG94TEkwREhRVlgveU00ZzBYdlhsTTREV0ZWSmpwS2E4cUVVY0ppWU5pbjEvNHN3eUFCN1NsK0lMUwplN3RKTlpJV3I3MTdUVERYTVc5SVdOejhnNk9sQWdNQkFBR2pXVEJYTUE0R0ExVWREd0VCL3dRRUF3SUNwREFQCkJnTlZIUk1CQWY4RUJUQURBUUgvTUIwR0ExVWREZ1FXQkJSS3k3R2c4NDlvbHFUZjk2UlNrcVZGVU1EdEV6QVYKQmdOVkhSRUVEakFNZ2dwcmRXSmxjbTVsZEdWek1BMEdDU3FHU0liM0RRRUJDd1VBQTRJQkFRQXVjcE5NR3V4NwpUdTZqaC9UdkkzWTRhQ3ZKNTc5WjVIM2xUbWVSb05zRGRpQW9uZVF3WHJDZTZhZG5jYk50aTZiWDY1RXhMT2ZpCk96dUtGUHNKRjVYNmRlc1FoWm5SS3cydHBaQUNkb00yYmEyUEhiSmhpdTFkRGFydGU3Zzd3VWhVWXBRM3o3eVYKU2xUTmk4dFpLWHRjY3U1WUJyRDFibHNRMG9CdFQ1Zmx6ME9vZW5QeWs1T1RtTElWZjU1bzNxWEJEakgyc0FTWgorM2ZQZkZEalp4MldsRU12eFFObTFBdXNyL2l4U1Y4K3F4VEE5R2pleC9vaVozQ1RPZ08zckIraWhzbERsc0VtCmt0Z3plOXR2cG5DeGtVOFVMNDNFbllRanJzUTh5eTBqWmRRcHlWcFJ3UXRnUllaR0k1RnhvL01naFRsMm14UlkKSSt3V2lHRXVtQzV0Ci0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0K
+  name: eks_hp-udd-prod
+
+contexts:
+- context:
+    cluster: eks_hp-udd-prod
+    user: eks_hp-udd-prod
+  name: eks_hp-udd-prod
+
+current-context: eks_hp-udd-prod
+
+users:
+- name: eks_hp-udd-prod
+  user:
+    exec:
+      apiVersion: client.authentication.k8s.io/v1alpha1
+      command: aws-iam-authenticator
+      args:
+        - "token"
+        - "-i"
+        - "hp-udd-prod"
+
+EOT
+private_subnets = [
+  "subnet-06ab05fbfd378bbc0",
+  "subnet-079384c6aa806aa50",
+]
+public_subnets = [
+  "subnet-02d9b873c4971a9cc",
+  "subnet-0eb925d892e6fffc2",
+]
+vpc_id = "vpc-01a46576852d5b10f"
+worker_security_group_id = "sg-081bcbf2ff0fb616c"
+zone = [
+  "ap-south-1b",
+]
+zookeeper_volume_ids = [
+  "vol-08cff239bf2cfc6f3",
+  "vol-0048fb71301e64ab1",
+  "vol-0b69b519f3594bc8e",
+]

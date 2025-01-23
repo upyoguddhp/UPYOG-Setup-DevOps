@@ -10,7 +10,7 @@ namespace: egov
 initContainers: 
   extraInitContainers: |
     - name: "zuul-kubernetes-discovery"
-      image: "{{ .Values.global.containerRegistry }}/zuul-kubernetes-discovery:2-master-91c9795"      
+      image: "{{ .Values.global.containerRegistry }}/zuul-kubernetes-discovery:vNA-452b00d9de-2"      
       env: 
       - name: "OUTPUT_FILE_PATH"
         value: "/etc/zuul/routes.properties" 
@@ -46,7 +46,7 @@ tracing-enabled: true
 server-tomcat-max-threads: "350"
 server-tomcat-max-connections: "1500"
 java-args: ""
-egov-open-endpoints-whitelist: "/user/oauth/token,/user-otp/v1/_send,/otp/v1/_validate,/user/citizen/_create,/localization/messages,/localization/messages/v1/_search,/user/password/nologin/_update,/tenant/v1/tenant/_search,/egov-location/boundarys,/egov-location/boundarys/boundariesByBndryTypeNameAndHierarchyTypeName,/egov-location/boundarys/getLocationByLocationName,/egov-mdms-service/v1/_search,/egov-location/location/v11/geography/_search,/filestore/v1/files/url,/pt-calculator-v2/billing-slab/_search,/egov-searcher/property-services/propertyopensearch/_get,/edcr/rest/dcr/downloadfile"  
+egov-open-endpoints-whitelist: "/user/oauth/token,/user-otp/v1/_send,/otp/v1/_validate,/user/citizen/_create,/localization/messages,/localization/messages/v1/_search,/user/password/nologin/_update,/pgr/servicedefinition/v1/_search,/pgr/servicecategories/v1/_search,/pgr/v1/otp/_send,/pgr-master/receivingmode/v1/_search,/tenant/v1/tenant/_search,/egov-location/boundarys,/egov-location/boundarys/boundariesByBndryTypeNameAndHierarchyTypeName,/pgr-master/service/v1/_search,/egov-location/boundarys/getLocationByLocationName,/pgr-master/OTPConfig/_search,/pgr-master/serviceGroup/v1/_search,/egov-location/boundarys/isshapefileexist,/pgr/services/v1/_search,/hr-masters/hrconfigurations/_search,/collection-services/receipts/_view,/pgr-master/service/v2/_search,/pgr-master/servicedefinition/v1/_search,/citizen-services,/citizen-services/v1/requests/_search,/admin/abc,/whatsapp-webhook/messages,/user/_landingPage,/user/_login,/user/_logout,/hpud-dms-service/dms/uploadAttachments,/hpud-dms-service/dms/downloadFile,/hpud-dms-service/dms/fetchServicebyDocID,/tl-services/v1/fetch/APPLICATIONDETAILS,/tl-services/v1/fetch/APPLICATIONDETAILS,/garbage-service/garbage-common/getAllCounts,/pet-services/pet-registration/getAllCounts,/asset-services/v1/assets/getAllCounts,/adrvcanopy-services/site/getAllCounts,/report/pdf-service/v1/_create,/hpud-landing-service/landing/getLandingPageCount,/scheduler/scheduler/execute,/mdms-v2/schema/v1/_create,/scheduler/execute,/garbage-service/garbage-accounts/_payNow,/notification-sms/otp"  
 egov-mixed-mode-endpoints-whitelist: "/filestore/v1/files/id,/filestore/v1/files,/filestore/v1/files/tag,/user/_search,/access/v1/actions/mdms/_get,/tl-services/v1/_search,/tl-services/v1/BPAREG/_search,/tl-services/v1/BPAREG/_create,/tl-services/v1/BPAREG/_update,/tl-calculator/v1/BPAREG/_getbill,/bpa-services/bpa/appl/_search,/edcr/rest/dcr/scrutinize,/edcr/rest/dcr/scrutinydetails"
 eventlog-enabled: "false"
 eventlog-topic: "zuul-event-log"

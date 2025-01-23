@@ -50,7 +50,7 @@ func main() {
 		os.Exit(1)
 	}
 	// Read the YAML file
-	yamlFile, err := ioutil.ReadFile("../../../config-as-code/environments/upyog-demo.yaml")
+	yamlFile, err := ioutil.ReadFile("../../../config-as-code/environments/hp-udd-prod.yaml")
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error reading YAML file: %v\n", err)
 		os.Exit(1)
@@ -75,7 +75,7 @@ func main() {
 	// Write the updated YAML to stdout
 	fmt.Println(output)
 
-	err = ioutil.WriteFile("../../../config-as-code/environments/upyog-demo.yaml", []byte(output), 0644)
+	err = ioutil.WriteFile("../../../config-as-code/environments/hp-udd-prod.yaml", []byte(output), 0644)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error writing YAML file: %v\n", err)
 		os.Exit(1)

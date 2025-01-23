@@ -5,7 +5,7 @@
 
 variable "cluster_name" {
   description = "Name of the Kubernetes cluster"
-  default = <cluster_name> #REPLACE
+  default = "hp-udd-prod" #REPLACE
 }
 
 variable "vpc_cidr_block" {
@@ -26,7 +26,7 @@ variable "availability_zones" {
 
 variable "kubernetes_version" {
   description = "kubernetes version"
-  default = "1.27"
+  default = "1.31"
 }
 
 variable "instance_type" {
@@ -42,30 +42,30 @@ variable "override_instance_types" {
 
 variable "number_of_worker_nodes" {
   description = "eGov recommended below worker node counts as default"
-  default = "4" #REPLACE IF NEEDED
+  default = "6" #REPLACE IF NEEDED
 }
 
 variable "ssh_key_name" {
   description = "ssh key name, not required if your using spot instance types"
-  default = <ssh_key_name> #REPLACE
+  default = "hp-udd-key2" #REPLACE
 }
 
 
 variable "db_name" {
   description = "RDS DB name. Make sure there are no hyphens or other special characters in the DB name. Else, DB creation will fail"
-  default = <db_name> #REPLACE
+  default = "hp_udd_prod" #REPLACE
 }
 
 variable "db_username" {
   description = "RDS database user name"
-  default = <db_username> #REPLACE
+  default = "postgres" #REPLACE
 }
 
 #DO NOT fill in here. This will be asked at runtime
 variable "db_password" {}
 
 variable "public_key" {
-  default = <public_ssh_key>
+  default = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDC6xc6OR0ulATOjug//wJYj3Ajjpz09H8HhN4dl4cFpqFlYpx1PjE291yTjHO7BTHM6I/GYHFPkdNVv92E73N7EQKEcEMblJ+wCa3EV/PC2uQaDEAvQvhlQgx3ZZ635qvbRD3sPPPzwGYNcgnJctDjSg6W0GjCuXxLZHW6Sl7enOkT6gBAGPjhYmSy9Qnaoi056y56t1sETfik+0TCTsafJ9noeUprmJLf8HRZfvEX5YYX/gkBUgHJXmBz1zWw9AQsv9YHqEP/3YO/lI+Co6UsdDUKz6ODEa1Iqrdq/vRw8LZ+1+65qzcLODtyxXwETUIn9i9TlCClWHbgrjON501Z svchaudhari.ext@INPUNSVCHAUDHAR"
   description = "ssh key"
 }
 

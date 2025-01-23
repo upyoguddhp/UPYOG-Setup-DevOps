@@ -1,0 +1,66 @@
+# Common Labels
+labels:
+  app: "scheduler"
+
+# Ingress Configs
+ingress:
+  enabled: true
+  zuul: true
+  context: "scheduler"
+
+# InitContainers Configs
+initContainers:
+  dbMigration:
+    enabled: true
+    schemaTable: "scheduler_schema"
+    image:
+      repository: "scheduler-db"
+
+# Container Configs
+image:
+  repository: "scheduler"
+replicas: "1"
+healthChecks:
+  enabled: false
+  livenessProbePath: "/scheduler/health"
+  readinessProbePath: "/scheduler/health"
+appType: "java-spring"
+tracing-enabled: true
+heap: "-Xmx512m -Xms512m"
+
+env: |
+  - name: SERVER_CONTEXT_PATH
+    value: "/schedular"
+  - name: SERVER_PORT
+    value: "8080"
+  - name: EGOV_MDMS_HOST
+    valueFrom:
+      configMapKeyRef:
+        name: egov-service-host
+        key: egov-mdms-service
+  - name: EGOV_MDMS_SEARCH_ENDPOINT
+    value: "/egov-mdms-service/v1/_search"
+  - name: EGOV_BILL_CONTEXT_HOST
+    valueFrom:
+      configMapKeyRef:
+        name: egov-service-host
+        key: billing-service
+  - name: EGOV_BILL_ENDPOINT_FETCH
+    value: "/billing-service/bill/v2/_fetchbill"
+  - name: EGOV_BILL_ENDPOINT_SEARCH
+    value: "/billing-service/bill/v2/_search"
+  - name: EGOV_DEMAND_CREATE_ENDPOINT
+    value: "/billing-service/demand/_create"
+  - name: EGOV_DEMAND_SEARCH_ENDPOINT
+    value: "/billing-service/demand/_search?tenantId={1}&businessService={2}&consumerCode={3}"
+  - name: EGOV_DEMAND_UPDATE_ENDPOINT
+    value: "/billing-service/demand/_update"
+  - name: EGOV_GARBAGE_CONTEXT_HOST
+    valueFrom:
+      configMapKeyRef:
+        name: egov-service-host
+        key:  egov-garbage-service
+  - name: EGOV_GARBAGE_ENDPOINT_BILL_GENERATOR
+    value: "/garbage-service/garbage-accounts-scheduler/bill-generator"
+  - name: CRON_JOB_DEFAULT_GARBAGE_BILL_GENERATOR
+    value: "0 0 0 1 * *"

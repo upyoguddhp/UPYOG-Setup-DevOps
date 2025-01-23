@@ -131,6 +131,60 @@ env: |
       secretKeyRef:
         name: egov-pg-service
         key: axismerchantaccesscode
+  - name: PAYTMPOS_MERCHANT_ID
+    valueFrom:
+      secretKeyRef:
+        name: egov-pg-service
+        key: paytmposmerchantid
+  - name: PAYTMPOS_MERCHANT_SECRET_KEY
+    valueFrom:
+      secretKeyRef:
+        name: egov-pg-service
+        key: paytmposmerchantsecretkey
+  - name: PAYTMPOS_MERCHANT_SECRET_TID
+    valueFrom:
+      secretKeyRef:
+        name: egov-pg-service
+        key: paytmposmerchantsecrettid
+  - name: PAYTMPOST_URL_DEBIT
+    value: "https://securegw-stage.paytm.in/ecr/payment/requesty"
+  - name: PAYTMPOST_URL_STATUS
+    value: "https://securegw-stage.paytm.in/ecr/V2/payment/status"
+  {{- end }}
+  {{- if .Values.razorpay }}
+  - name: RAZORPAY_ACTIVE
+    value: "true"
+  - name: RAZORPAY_CURRENCY
+    value: INR
+  - name: RAZORPAY_ORDER_CREATE_URL
+    value: https://api.razorpay.com/v1/orders
+  - name: RAZORPAY_MERCHANT_PAYMENTS_ORDERID_FETCH_URL
+    value: https://api.razorpay.com/v1/orders/%s/payments
+  - name: RAZORPAY_MERCHANT_ID
+    valueFrom:
+      secretKeyRef:
+        key: razorpaymerchantid
+        name: egov-pg-service
+  - name: RAZORPAY_MERCHANT_SECRET_KEY
+    valueFrom:
+      secretKeyRef:
+        key: razorpaymerchantsecret
+        name: egov-pg-service
+  - name: RAZORPAY_MERCHANT_USER
+    valueFrom:
+      secretKeyRef:
+        key: razorpaymerchantuser
+        name: egov-pg-service
+  - name: RAZORPAY_MERCHANT_PWD
+    valueFrom:
+      secretKeyRef:
+        key: razorpaymerchantpwd
+        name: egov-pg-service
+  - name: RAZORPAY_KEY_ID
+    valueFrom:
+      secretKeyRef:
+        key: razorpaykeyid
+        name: egov-pg-service
   {{- end }}
   {{- if index .Values "payu-url" }}
   - name: PAYU_ACTIVE

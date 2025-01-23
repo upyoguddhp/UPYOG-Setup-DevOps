@@ -1,0 +1,37 @@
+# Common Labels
+labels:
+  app: "hpud-landing-service"
+
+# Ingress Configs
+ingress:
+  enabled: true
+  zuul: true
+  context: "hpud-landing-service"  
+
+
+# Container Configs
+image:
+  repository: "hpud-landing-service"
+replicas: "1"
+httpPort: 9095
+healthChecks:
+  enabled: true
+  livenessProbePath: "/hpud-landing-service/health"
+  readinessProbePath: "/hpud-landing-service/health"
+appType: java-spring
+
+env: |
+  - name: SPRING_DATA_JPA_REPOSITORIES_ENABLED
+    value: "true"
+  - name: SPRING_JPA_HIBERNATE_NAMING_IMPLICIT_STRATEGY
+    value: "org.hibernate.boot.model.naming.ImplicitNamingStrategyLegacyJpaImpl"
+  - name: SPRING_JPA_HIBERNATE_NAMING_PHYSICAL_STRATEGY
+    value: "org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl"
+  - name: SERVER_CONTEXT_PATH
+    value: "/hpud-landing-service"
+  - name: SERVER_SERVLET_CONTEXT_PATH
+    value: "/hpud-landing-service"
+  - name: SPRING_JPA_OPEN_IN_VIEW
+    value: "true"
+  - name: APP_TIMEZONE
+    value: "UTC"

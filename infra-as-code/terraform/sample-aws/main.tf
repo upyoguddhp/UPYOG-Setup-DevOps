@@ -1,14 +1,14 @@
-terraform {
-  backend "s3" {
-    bucket = <terraform_state_bucket_name>
-    key    = "digit-bootcamp-setup/terraform.tfstate"
-    region = "ap-south-1"
-    # The below line is optional depending on whether you are using DynamoDB for state locking and consistency
-    dynamodb_table = <terraform_state_bucket_name>
-    # The below line is optional if your S3 bucket is encrypted
-    encrypt = true
-  }
-}
+#terraform {
+#  backend "s3" {
+#    bucket = "hp-udd-2"
+#    key    = "digit-bootcamp-setup/terraform.tfstate"
+#    region = "ap-south-1"
+#    # The below line is optional depending on whether you are using DynamoDB for state locking and consistency
+#    dynamodb_table = "hp-udd-2"
+#    # The below line is optional if your S3 bucket is encrypted
+#    encrypt = true
+#  }
+#}
 
 module "network" {
   source             = "../modules/kubernetes/aws/network"
@@ -33,6 +33,8 @@ module "db" {
   identifier                    = "${var.cluster_name}-db"
   db_name                       = "${var.db_name}"
   environment                   = "${var.cluster_name}"
+
+
 }
 
 data "aws_eks_cluster" "cluster" {
@@ -150,24 +152,28 @@ resource "aws_security_group_rule" "rds_db_ingress_workers" {
   to_port                  = 5432
   protocol                 = "tcp"
   security_group_id        = "${module.network.rds_db_sg_id}"
-  source_security_group_id = "${module.eks.worker_security_group_id}"
+  #source_security_group_id = "${module.eks.worker_security_group_id}"
   type                     = "ingress"
+  cidr_blocks = [
+    "0.0.0.0/0"  # Example: Allow access from anywhere (not recommended for production)
+    # Add specific IPs or ranges as needed
+  ]
 }
 
 resource "aws_eks_addon" "kube_proxy" {
   cluster_name      = data.aws_eks_cluster.cluster.name
   addon_name        = "kube-proxy"
-  resolve_conflicts = "OVERWRITE"
+  resolve_conflicts_on_create = "OVERWRITE"
 }
 resource "aws_eks_addon" "core_dns" {
   cluster_name      = data.aws_eks_cluster.cluster.name
   addon_name        = "coredns"
-  resolve_conflicts = "OVERWRITE"
+  resolve_conflicts_on_create = "OVERWRITE"
 }
 resource "aws_eks_addon" "aws_ebs_csi_driver" {
   cluster_name      = data.aws_eks_cluster.cluster.name
   addon_name        = "aws-ebs-csi-driver"  
-  resolve_conflicts = "OVERWRITE"
+  resolve_conflicts_on_create = "OVERWRITE"
 }
 
 module "es-master" {

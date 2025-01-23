@@ -70,6 +70,11 @@ env: |
     value: org.apache.kafka.common.serialization.StringSerializer
   - name: SPRING_KAFKA_PRODUCER_VALUE_SERIALIZER
     value: org.springframework.kafka.support.serializer.JsonSerializer
+  - name: EGOV_MDMS_HOST
+    valueFrom:
+      configMapKeyRef:
+        name: egov-service-host
+        key: egov-mdms-service
   - name: USER_SERVICE_HOST
     valueFrom:
       configMapKeyRef:

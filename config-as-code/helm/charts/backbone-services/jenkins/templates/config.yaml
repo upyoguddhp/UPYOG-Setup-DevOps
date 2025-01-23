@@ -99,7 +99,7 @@ data:
           <name>All</name>
           <filterExecutors>false</filterExecutors>
           <filterQueue>false</filterQueue>
-          <properties class="hudson.model.View$PropertyList"/>
+          <properties class="hudson.model.View$PropertyList"/>    
         </hudson.model.AllView>
       </views>
       <primaryView>All</primaryView>

@@ -51,6 +51,44 @@ env: |
       configMapKeyRef:
         name: egov-service-host
         key: egov-apportion-service
+  - name: EGOV_IDGEN_HOSTNAME
+    valueFrom:
+      configMapKeyRef:
+        name: egov-service-host
+        key: egov-idgen
+  - name: EGOV_IDGEN_URI
+    value: "/egov-idgen/id/_generate"
+  - name: AMENDMENT_ID_FORMAT_NAME
+    value: "bs.amendment.id"
+  - name: BS_BILL_BILLNUMBER_FORMAT
+    value: "BILLNO-{module}-[SEQ_egbs_billnumber{tenantid}]"
+  - name: BS_BILL_BILLNUMBER_FORMAT_MODULE
+    value: "{module}"
+  - name: BS_BILL_BILLNUMBER_FORMAT_TENANTID
+    value: "{tenantid}"
+  - name: ISTENANTLEVELBILLNUMBERINGENABLED
+    value: "false"
+  - name: IS_AMENDMENT_WORKFLOW_ENABLED
+    value: "true"
+  - name: WORKFLOW_HOST
+    valueFrom:
+      configMapKeyRef:
+        name: egov-service-host
+        key: egov-workflow-v2
+  - name: WORKFLOW_TRANSITION_PATH
+    value: "/egov-workflow-v2/egov-wf/process/_transition"
+  - name: WORKFLOW_BUSINESSSERVICE_SEARCH_PATH
+    value: "/egov-workflow-v2/egov-wf/businessservice/_search"
+  - name: WORKFLOW_PROCESSINSTANCE_SEARCH_PATH
+    value: "/egov-workflow-v2/egov-wf/process/_search"
+  - name: WORKFLOW_OPEN_ACTION
+    value: "OPEN"
+  - name: WORKFLOW_MODULENAME
+    value: "BS"
+  - name: AMENDMENT_WORKFLOW_NAME
+    value: "BS.AMENDMENT"
+  - name: AMENDMENT_DEFAULT_LIMIT
+    value: "100"
   - name: SPRING_KAFKA_CONSUMER_GROUP_ID
     value: bs-persist
   - name: SPRING_KAFKA_PRODUCER_KEY_SERIALIZER

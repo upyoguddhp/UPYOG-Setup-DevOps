@@ -1,0 +1,21 @@
+# Common Labels
+labels:
+  app: "hp-upyog"
+
+# Ingress Configs
+ingress:
+  enabled: true
+  context: "hp-upyog"  
+
+
+# Container Configs
+image:
+  repository: "svchaudhari/hp-upyog"
+replicas: "1"
+httpPort: 80
+healthChecks:
+  enabled: false
+  livenessProbePath: "/hp-upyog/health"
+  readinessProbePath: "/hp-upyog/health"
+
+# Additional Container Envs

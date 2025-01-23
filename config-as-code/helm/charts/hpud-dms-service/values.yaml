@@ -1,0 +1,23 @@
+# Common Labels
+labels:
+  app: "hpud-dms-service"
+
+# Ingress Configs
+ingress:
+  enabled: true
+  zuul: true
+  context: "hpud-dms-service"  
+
+
+# Container Configs
+image:
+  repository: "hpud-dms-service"
+httpPort: 8095
+replicas: "1"
+healthChecks:
+  enabled: true
+  livenessProbePath: "/hpud-dms-service/health"
+  readinessProbePath: "/hpud-dms-service/health"
+appType: java-spring
+
+# Additional Container Envs

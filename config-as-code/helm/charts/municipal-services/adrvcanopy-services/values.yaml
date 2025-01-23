@@ -1,0 +1,157 @@
+# Common Labels
+labels:
+  app: "adrvcanopy-services"
+
+# Ingress Configs
+ingress:
+  enabled: true
+  zuul: true
+  context: "adrvcanopy-services"  
+
+# Init Containers Configs
+initContainers:
+  dbMigration:
+    enabled: true
+    schemaTable: "adrvcanopy_services_schema"
+    image:
+      repository: "upyoguddhp/adrvcanopy-services-db"
+
+# Container Configs
+image:
+  repository: "upyoguddhp/adrvcanopy-services"
+replicas: "1"
+healthChecks:
+  enabled: true
+  livenessProbePath: "/adrvcanopy-services/health"
+  readinessProbePath: "/adrvcanopy-services/health"
+appType: java-spring
+#Additional Container Envs
+# Additional Container Envs
+env: |
+  - name: EGOV_IDGEN_HOST
+    valueFrom:
+      configMapKeyRef:
+        name: egov-service-host
+        key: egov-idgen
+  - name: SERVER_PORT
+    value: "8080"
+  - name: SERVER_CONTEXT_PATH
+    value: "/adrvcanopy-services"
+  - name: SERVER_SERVLET_CONTEXT_PATH
+    value: "/adrvcanopy-services"
+  - name: APP_TIMEZONE
+    valueFrom:
+      configMapKeyRef:
+        key: timezone
+        name: egov-config
+  - name: SPRING_DATASOURCE_DRIVER_CLASS_NAME
+    value: "org.postgresql.Driver"
+  - name: SPRING_DATASOURCE_URL
+    valueFrom:
+      configMapKeyRef:
+        key: db-url
+        name: egov-config
+  - name: SPRING_DATASOURCE_USERNAME
+    valueFrom:
+      secretKeyRef:
+        key: username
+        name: db
+  - name: SPRING_DATASOURCE_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        key: password
+        name: db
+  - name: SPRING_FLYWAY_ENABLED
+    value: "true"
+  - name: SPRING_FLYWAY_URL
+    valueFrom:
+      configMapKeyRef:
+        key: db-url
+        name: egov-config
+  - name: SPRING_FLYWAY_USER
+    valueFrom:
+      secretKeyRef:
+        key: username
+        name: db
+  - name: SPRING_FLYWAY_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        key: password
+        name: db
+  - name: SPRING_FLYWAY_TABLE
+    value: "eg_site_schema_table"
+  - name: SPRING_FLYWAY_LOCATIONS
+    value: "classpath:db/migration/ddl"
+  - name: SPRING_FLYWAY_BASELINE_ON_MIGRATE
+    value: "true"
+  - name: SPRING_FLYWAY_OUT_OF_ORDER
+    value: "true"
+  - name: WORKFLOW_CONTEXT_PATH
+    valueFrom:
+      configMapKeyRef:
+        key: egov-workflow-v2
+        name: egov-service-host
+  - name: WORKFLOW_TRANSITION_PATH
+    value: "/egov-workflow-v2/egov-wf/process/_transition"
+  - name: WORKFLOW_BUSINESS_SEARCH
+    value: "/egov-workflow-v2/egov-wf/businessservice/_search"
+  - name: EGOV_BILL_CONTEXT_HOST
+    valueFrom:
+      configMapKeyRef:
+        key: billing-service
+        name: egov-service-host
+  - name: EGOV_BILL_ENDPOINT_FETCH
+    value: "/billing-service/bill/v2/_fetchbill"
+  - name: EGOV_BILL_ENDPOINT_SEARCH
+    value: "/billing-service/bill/v2/_search"
+  - name: EGOV_DEMAND_CREATE_ENDPOINT
+    value: "/billing-service/demand/_create"
+  - name: EGOV_DEMAND_SEARCH_ENDPOINT
+    value: "/billing-service/demand/_search?tenantId={1}&businessService={2}&consumerCode={3}"
+  - name: EGOV_DEMAND_UPDATE_ENDPOINT
+    value: "/billing-service/demand/_update"
+  - name: EGOV_IDGEN_ADV_BOOKINGNUM_NAME
+    value: "advt.bknNum"
+  - name: EGOV_IDGEN_PATH
+    value: "egov-idgen/id/_generate"
+  - name: EGOV_REPORT_HOST
+    valueFrom:
+      configMapKeyRef:
+        name: egov-service-host
+        key: report
+  - name: EGOV_REPORT_ENDPOINT_CREATE
+    value: "/report/pdf-service/v1/_create"
+  - name: EGOV_ALFRESCO_HOST
+    valueFrom:
+      configMapKeyRef:
+        key: hpud-dms-service
+        name: egov-service-host
+  - name: EGOV_ALFRESCO_ENDPOINT_UPLOAD
+    value: /hpud-dms-service/dms/uploadAttachments
+  - name: EGOV_IDGEN_ADVERTISEMENTCANOPY_BOOKING_NUMBER
+    value: "PRAD/ULBNAME/VALIDITYPERIOD/00[SEQ_EG_SITE_BOOKING]"
+  - name: KAFKA_CONFIG_BOOTSTRAP_SERVER_CONFIG
+    valueFrom:
+      configMapKeyRef:
+        key: kafka-brokers
+        name: egov-config
+  - name: SPRING_KAFKA_CONSUMER_VALUE_DESERIALIZER
+    value: "org.egov.tracer.kafka.deserializer.HashMapDeserializer"
+  - name: SPRING_KAFKA_CONSUMER_KEY_DESERIALIZER
+    value: "org.apache.kafka.common.serialization.StringDeserializer"
+  - name: SPRING_KAFKA_CONSUMER_GROUP_ID
+    value: "egov-location"
+  - name: SPRING_KAFKA_PRODUCER_KEY_SERIALIZER
+    value: "org.apache.kafka.common.serialization.StringSerializer"
+  - name: SPRING_KAFKA_PRODUCER_VALUE_SERIALIZER
+    value: "org.springframework.kafka.support.serializer.JsonSerializer"
+  - name: SPRING_KAFKA_CONSUMER_PROPERTIES_SPRING_JSON_USE_TYPE_HEADERS
+    value: "false"
+  - name: SPRING_KAFKA_LISTENER_MISSING_TOPICS_FATAL
+    value: "false" 
+  - name: MANAGEMENT_SECURITY_ENABLED
+    value: "false"
+  {{- if index .Values "tracing-enabled" }}
+  - name: TRACER_OPENTRACING_ENABLED
+    value: "true" 
+  {{- end }} 

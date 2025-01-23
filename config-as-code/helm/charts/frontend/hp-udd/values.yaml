@@ -1,0 +1,21 @@
+# Common Labels
+labels:
+  app: "hp-udd"
+
+# Ingress Configs
+ingress:
+  enabled: true
+  context: "hp-udd"  
+
+
+# Container Configs
+image:
+  repository: "upyoguddhp/hp-udd"
+replicas: "1"
+httpPort: 80
+healthChecks:
+  enabled: false
+  livenessProbePath: "/hp-udd/health"
+  readinessProbePath: "/hp-udd/health"
+
+# Additional Container Envs

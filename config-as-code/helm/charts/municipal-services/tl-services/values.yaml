@@ -59,6 +59,11 @@ env: |
       configMapKeyRef:
         name: egov-service-host
         key: egov-location
+  - name: EGOV_BILLINGSERVICE_HOST
+    valueFrom:
+      configMapKeyRef:
+        name: egov-service-host
+        key: billing-service
   - name: EGOV_TL_CALCULATOR_HOST
     valueFrom:
       configMapKeyRef:
@@ -78,7 +83,14 @@ env: |
     valueFrom:
       configMapKeyRef:
         name: egov-service-host
-        key: egov-url-shortening
+        key: egov-url-shortening 
+  - name: EGOV_REPORT_HOST
+    valueFrom:
+      configMapKeyRef:
+        name: egov-service-host
+        key: report
+  - name: EGOV_REPORT_ENDPOINT_CREATE
+    value: "/report/pdf-service/v1/_create"
   - name: EGOV_URL_SHORTNER_ENDPOINT
     value: {{ index .Values "egov-url-shortner-endpoint" | quote }}
   - name: EGOV_MDMS_SEARCH_ENDPOINT
@@ -97,6 +109,13 @@ env: |
     value: org.apache.kafka.common.serialization.StringSerializer
   - name: SPRING_KAFKA_PRODUCER_VALUE_SERIALIZER
     value: org.springframework.kafka.support.serializer.JsonSerializer
+  - name: EGOV_ALFRESCO_HOST
+    valueFrom:
+      configMapKeyRef:
+        name: egov-service-host
+        key: hpud-dms-service
+  - name: EGOV_ALFRESCO_ENDPOINT_UPLOAD
+    value: "/hpud-dms-service/dms/uploadAttachments"
   - name: WORKFLOW_CONTEXT_PATH
     valueFrom:
       configMapKeyRef:

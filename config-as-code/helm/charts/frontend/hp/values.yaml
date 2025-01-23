@@ -1,0 +1,21 @@
+# Common Labels
+labels:
+  app: "hp"
+
+# Ingress Configs
+ingress:
+  enabled: true
+  context: "hp"  
+
+
+# Container Configs
+image:
+  repository: "svchaudhari/hp"
+replicas: "1"
+httpPort: 3000
+healthChecks:
+  enabled: false
+  livenessProbePath: "/hp/"
+  readinessProbePath: "/hp/"
+
+# Additional Container Envs

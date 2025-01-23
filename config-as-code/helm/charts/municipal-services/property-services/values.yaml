@@ -40,6 +40,15 @@ env: |
       configMapKeyRef:
         name: egov-service-host
         key: egov-idgen
+  - name: EGOV_ENC_HOST
+    valueFrom:
+      configMapKeyRef:
+        name: egov-service-host
+        key: egov-enc-service
+  - name: EGOV_ENC_ENCRYPT_ENDPOINT
+    value: /egov-enc-service/crypto/v1/_encrypt
+  - name: EGOV_ENC_DECRYPT_ENDPOINT
+    value: /egov-enc-service/crypto/v1/_decrypt
   - name: STATE_LEVEL_TENANT_ID
     valueFrom:
       configMapKeyRef:
@@ -70,6 +79,16 @@ env: |
       configMapKeyRef:
         name: egov-service-host
         key: pt-calculator-v2
+  - name: WORKFLOW_HOST
+    valueFrom:
+      configMapKeyRef:
+        name: egov-service-host
+        key: egov-workflow-v2
+  - name: EGOV_URL_SHORTNER_HOST
+    valueFrom:
+      configMapKeyRef:
+        name: egov-service-host
+        key: egov-url-shortening
   - name: EGOV_PT-SERVICES-V2_HOST
     valueFrom:
       configMapKeyRef:
@@ -111,6 +130,8 @@ env: |
     value: "false"
   - name: ASSESSMENT_WORKFLOW_ENABLED
     value: "false"
+  - name: IS_WORKFLOW_ENABLED
+    value: "true"
   - name: EGOV_IDGEN_ACK_FORMAT
     value: {{ index .Values "egov-idgen-ack-format" | quote }}
   - name: EGOV_IDGEN_MUTATION_FORMAT
@@ -119,7 +140,6 @@ env: |
     value: {{ index .Values "egov-idgen-assm-format" | quote }} 
   - name: EGOV_IDGEN_PTID_FORMAT
     value: {{ index .Values "egov-idgen-ptid-format" | quote }}        
-
   - name: NOTIFICATION_SMS_ENABLED
     value: {{ index .Values "notification-sms-enabled" | quote }}
   - name: EGOV_USER_EVENT_NOTIFICATION_ENABLED

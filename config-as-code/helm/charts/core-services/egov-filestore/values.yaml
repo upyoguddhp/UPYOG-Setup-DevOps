@@ -36,6 +36,7 @@ is-s3-enabled: true
 persistence:
   enabled: false
 
+memory_limits: "300Mi"
 # Additional Container Envs
 env: |
   - name: SERVER_PORT

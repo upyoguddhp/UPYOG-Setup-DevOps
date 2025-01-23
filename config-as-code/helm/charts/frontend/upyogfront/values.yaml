@@ -1,0 +1,21 @@
+# Common Labels
+labels:
+  app: "upyogfront"
+
+# Ingress Configs
+ingress:
+  enabled: true
+  context: "upyogfront"  
+
+
+# Container Configs
+image:
+  repository: "svchaudhari/upyogfront"
+replicas: "1"
+httpPort: 3000
+healthChecks:
+  enabled: false
+  livenessProbePath: "/upyogfront/"
+  readinessProbePath: "/upyogfront/"
+
+# Additional Container Envsc mcmcmmcmccm vmmvmmmmvvmvmmmmmvmmmvmxnccc mvmm mmfddddddddddddb     c

@@ -60,13 +60,13 @@ env: |
   - name: GF_SERVER_DOMAIN
     value: {{ .Values.global.domain | quote }}   
 
-resources:
- limits:
-   cpu: 300m
-   memory: 256Mi
- requests:
-   cpu: 100m
-   memory: 256Mi
+#resources:
+# limits:
+#   cpu: 300m
+#   memory: 256Mi
+# requests:
+#   cpu: 100m
+#   memory: 256Mi
 
 grafana.ini:
   paths:
