@@ -1,2 +1,4 @@
 /config-as-code/environments/upyog-demo-secrets.yaml
 **/.terraform/
+**/ci-demo-secrets.yaml
+**/hp-udd-prod-secrets.yaml
