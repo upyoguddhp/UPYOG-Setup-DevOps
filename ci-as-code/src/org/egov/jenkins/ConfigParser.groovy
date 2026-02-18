@@ -23,7 +23,7 @@ class ConfigParser {
         }
 
         if(filteredJobConfigs.isEmpty())
-            return [:]
+            return []
 
         List<JobConfig> jobConfigs = populateConfigs(filteredJobConfigs, env);
 
