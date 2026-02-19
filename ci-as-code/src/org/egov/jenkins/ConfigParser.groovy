@@ -23,7 +23,7 @@ class ConfigParser {
         }
 
         if(filteredJobConfigs.isEmpty())
-            return []
+            throw new Exception("No config exists for this job! ")
 
         List<JobConfig> jobConfigs = populateConfigs(filteredJobConfigs, env);
 
