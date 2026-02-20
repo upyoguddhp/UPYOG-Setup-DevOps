@@ -71,7 +71,13 @@ spec:
     imagePullPolicy: IfNotPresent
     command:
     - cat
-    tty: true        
+    tty: true
+  - name: kubectl
+    image: bitnami/kubectl:latest
+    imagePullPolicy: IfNotPresent
+    command:
+      - cat
+    tty: true       
   volumes:
   - name: kaniko-cache
     persistentVolumeClaim:
@@ -188,6 +194,19 @@ spec:
                                 }                                
                             }
                         }
+                    }
+                }
+                stage('Deploy to Kubernetes') {
+                    container('kubectl') {
+                        sh """
+                        echo "Deploying ${buildConfig.getImageName()}"
+
+                        kubectl set image deployment/${buildConfig.getImageName()} \
+                        ${buildConfig.getImageName()}=${image} \
+                        -n egov
+
+                        kubectl rollout status deployment/${buildConfig.getImageName()} -n egov
+                        """
                     }
                 }
                 // stage ("Update dashboard") {
