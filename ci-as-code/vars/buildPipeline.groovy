@@ -191,24 +191,23 @@ spec:
                                     --cache-repo=egovio/cache/cache
                                 """
                                 echo "${image} pushed successfully!"
-                                }                                
+                                }
+                                container('kubectl') {
+                                  sh """
+                                      echo "Deploying ${buildConfig.getImageName()}"
+
+                                      kubectl set image deployment/${buildConfig.getImageName()} \
+                                      ${buildConfig.getImageName()}=${image} \
+                                      -n egov
+
+                                      kubectl rollout status deployment/${buildConfig.getImageName()} -n egov
+                                  """
+                              }                                
                             }
                         }
                     }
                 }
-               stage("Deploy ${buildConfig.getImageName()}") {
-                    container('kubectl') {
-                        sh """
-                        echo "Deploying ${buildConfig.getImageName()}"
-
-                        kubectl set image deployment/${buildConfig.getImageName()} \
-                        ${buildConfig.getImageName()}=${image} \
-                        -n egov
-
-                        kubectl rollout status deployment/${buildConfig.getImageName()} -n egov
-                        """
-                    }
-                }
+               
                 // stage ("Update dashboard") {
                 //         environmentDashboard {
                 //             environmentName(scmVars.BRANCH)  
