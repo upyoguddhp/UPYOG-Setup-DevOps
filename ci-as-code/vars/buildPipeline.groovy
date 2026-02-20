@@ -196,7 +196,7 @@ spec:
                         }
                     }
                 }
-                stage('Deploy to Kubernetes') {
+               stage("Deploy ${buildConfig.getImageName()}") {
                     container('kubectl') {
                         sh """
                         echo "Deploying ${buildConfig.getImageName()}"
