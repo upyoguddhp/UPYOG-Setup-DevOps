@@ -71,13 +71,7 @@ spec:
     imagePullPolicy: IfNotPresent
     command:
     - cat
-    tty: true
-  - name: kubectl
-    image: bitnami/kubectl:latest
-    imagePullPolicy: IfNotPresent
-    command:
-      - cat
-    tty: true       
+    tty: true        
   volumes:
   - name: kaniko-cache
     persistentVolumeClaim:
@@ -191,26 +185,11 @@ spec:
                                     --cache-repo=egovio/cache/cache
                                 """
                                 echo "${image} pushed successfully!"
-                                }
-                                container('kaniko') {
-                                    sh """
-                                        apk add --no-cache curl
-                                        curl -LO https://storage.googleapis.com/kubernetes-release/release/`curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl
-                                        chmod +x kubectl
-                                        mv kubectl /usr/local/bin/
-
-                                        kubectl set image deployment/${buildConfig.getImageName()} \
-                                        ${buildConfig.getImageName()}=${image} \
-                                        -n egov
-
-                                        kubectl rollout status deployment/${buildConfig.getImageName()} -n egov
-                                    """
-                                }                               
+                                }                                
                             }
                         }
                     }
                 }
-               
                 // stage ("Update dashboard") {
                 //         environmentDashboard {
                 //             environmentName(scmVars.BRANCH)  
