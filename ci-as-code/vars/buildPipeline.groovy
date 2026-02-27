@@ -139,7 +139,7 @@ spec:
                             scmVars['ACTUAL_COMMIT'] = sh (script:
                                     '/scripts/get_folder_commit.sh ${BUILD_PATH}',
                                     returnStdout: true).trim()
-                            scmVars['BRANCH'] = params.BRANCH
+                            scmVars['BRANCH'] = params.BRANCH.replaceAll("origin/", "").replaceAll("/", "-")
                         }
                     }
                 }
