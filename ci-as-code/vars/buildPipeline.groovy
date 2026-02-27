@@ -104,8 +104,21 @@ spec:
     ) {
         node(POD_LABEL) {
 
-            def scmVars = checkout scm
-            String REPO_NAME = env.REPO_NAME ? env.REPO_NAME : "docker.io/egovio";         
+            def scmVars
+            stage('Checkout Branch') {
+                scmVars = checkout([
+                    $class: 'GitSCM',
+                    branches: [[name: params.BRANCH]],
+                    userRemoteConfigs: [[
+                        url: scm.userRemoteConfigs[0].url,
+                        credentialsId: scm.userRemoteConfigs[0].credentialsId
+                    ]]
+                ])
+            }
+
+            scmVars['BRANCH'] = params.BRANCH
+
+            String REPO_NAME = env.REPO_NAME ? env.REPO_NAME : "docker.io/upyoguddhp";         
             String GCR_REPO_NAME = "asia.gcr.io/digit-egov";
             def yaml = readYaml file: pipelineParams.configFile;
             List<JobConfig> jobConfigs = ConfigParser.parseConfig(yaml, env);
@@ -126,7 +139,7 @@ spec:
                             scmVars['ACTUAL_COMMIT'] = sh (script:
                                     '/scripts/get_folder_commit.sh ${BUILD_PATH}',
                                     returnStdout: true).trim()
-                            scmVars['BRANCH'] = scmVars['GIT_BRANCH'].replaceFirst("origin/", "")
+                            scmVars['BRANCH'] = params.BRANCH
                         }
                     }
                 }
