@@ -116,7 +116,7 @@ spec:
                 ])
             }
 
-            scmVars['BRANCH'] = params.BRANCH
+            scmVars['BRANCH'] = params.BRANCH.replaceAll("origin/", "").replaceAll("/", "-")
 
             String REPO_NAME = env.REPO_NAME ? env.REPO_NAME : "docker.io/upyoguddhp";         
             String GCR_REPO_NAME = "asia.gcr.io/digit-egov";
