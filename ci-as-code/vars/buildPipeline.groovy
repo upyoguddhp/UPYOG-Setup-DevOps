@@ -125,6 +125,7 @@ spec:
             String serviceCategory = null;
             String buildNum = null;
             String image = null;
+            String oldImage=null;
             for(int i=0; i<jobConfigs.size(); i++){
                 JobConfig jobConfig = jobConfigs.get(i)
 
@@ -156,9 +157,10 @@ spec:
                                     throw new Exception("Working directory / dockerfile does not exist!");
 
                                 String workDir = buildConfig.getWorkDir().replaceFirst(getCommonBasePath(buildConfig.getWorkDir(), buildConfig.getDockerFile()), "./")
-                                
+                                oldImage=${buildConfig.getImageName()};
                                 if(scmVars.BRANCH.equalsIgnoreCase("master")) {
                                   image = "${REPO_NAME}/${buildConfig.getImageName()}:v${scmVars.VERSION}-${scmVars.ACTUAL_COMMIT}-${env.BUILD_NUMBER}";
+                                  
                                 } else {
                                   image = "${REPO_NAME}/${buildConfig.getImageName()}:${scmVars.BRANCH}-${scmVars.ACTUAL_COMMIT}-${env.BUILD_NUMBER}";
                                 } 
@@ -220,11 +222,11 @@ spec:
                                 chmod +x kubectl
                                 mv kubectl /usr/local/bin/
 
-                                kubectl set image deployment/${buildConfig.getImageName()} \
-                                ${buildConfig.getImageName()}=${image} \
+                                kubectl set image deployment/${oldImage} \
+                                ${oldImage}=${image} \
                                 -n egov
 
-                                kubectl rollout status deployment/${buildConfig.getImageName()} -n egov
+                                kubectl rollout status deployment/${oldImage} -n egov
                             """
                    }                               
                 }
