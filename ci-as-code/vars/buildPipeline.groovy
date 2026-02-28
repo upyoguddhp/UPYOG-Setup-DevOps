@@ -214,21 +214,15 @@ spec:
                     }
                 }
                 stage('Deploy Service') {
+                    container('kubectl') {
+                        sh """
+                            kubectl set image deployment/${oldImage} \
+                            ${oldImage}=${image} \
+                            -n egov
 
-                   container('kaniko') {
-                            sh """
-                                apk add --no-cache curl
-                                curl -LO https://storage.googleapis.com/kubernetes-release/release/`curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl
-                                chmod +x kubectl
-                                mv kubectl /usr/local/bin/
-
-                                kubectl set image deployment/${oldImage} \
-                                ${oldImage}=${image} \
-                                -n egov
-
-                                kubectl rollout status deployment/${oldImage} -n egov
-                            """
-                   }                               
+                            kubectl rollout status deployment/${oldImage} -n egov
+                        """
+                    }
                 }
                
                 // stage ("Update dashboard") {
