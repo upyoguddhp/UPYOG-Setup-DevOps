@@ -157,7 +157,7 @@ spec:
                                     throw new Exception("Working directory / dockerfile does not exist!");
 
                                 String workDir = buildConfig.getWorkDir().replaceFirst(getCommonBasePath(buildConfig.getWorkDir(), buildConfig.getDockerFile()), "./")
-                                oldImage=${buildConfig.getImageName()};
+                                oldImage =  buildConfig.getImageName()
                                 if(scmVars.BRANCH.equalsIgnoreCase("master")) {
                                   image = "${REPO_NAME}/${buildConfig.getImageName()}:v${scmVars.VERSION}-${scmVars.ACTUAL_COMMIT}-${env.BUILD_NUMBER}";
                                   
