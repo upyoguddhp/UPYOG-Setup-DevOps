@@ -214,13 +214,24 @@ spec:
                     }
                 }
                 stage('Deploy Service') {
-                    container('kubectl') {
+                    container(name: 'kaniko', shell: '/busybox/sh') {
                         sh """
-                            kubectl set image deployment/${oldImage} \
-                            ${oldImage}=${image} \
-                            -n egov
+                            set -e
 
-                            kubectl rollout status deployment/${oldImage} -n egov
+                            echo "Downloading kubectl..."
+                            wget -O /busybox/kubectl \
+                              https://storage.googleapis.com/kubernetes-release/release/`wget -qO- https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl
+
+                            chmod +x /busybox/kubectl
+
+                            echo "Deploying image ${image}"
+
+                            /busybox/kubectl set image deployment/${oldImage} \
+                              ${oldImage}=${image} \
+                              -n egov
+
+                            /busybox/kubectl rollout status deployment/${oldImage} \
+                              -n egov --timeout=180s
                         """
                     }
                 }
