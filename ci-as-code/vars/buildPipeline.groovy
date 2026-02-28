@@ -217,11 +217,14 @@ spec:
                     container(name: 'kaniko', shell: '/busybox/sh') {
                         sh """
                             set -e
-                            
-                            DEPLOY_NAME=\$(echo ${oldImage} | sed 's/-db//')
-                            
-                            echo "Deploying to \$DEPLOY_NAME"
-                            echo "Image: ${image}"
+                            echo "Full image: ${image}"
+                            IMAGE_NAME=\$(echo ${image} | awk -F/ '{print \$NF}')
+                            IMAGE_NAME=\$(echo \$IMAGE_NAME | cut -d: -f1)
+                            DEPLOY_NAME=\$(echo \$IMAGE_NAME | sed 's/-db\$//')
+
+                            echo "Deployment name: \$DEPLOY_NAME"
+                            echo "Deploying image: ${image}"
+
                             
                             wget -O /busybox/kubectl \
                               https://storage.googleapis.com/kubernetes-release/release/`wget -qO- https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl
@@ -231,8 +234,9 @@ spec:
                             echo "Deploying image ${image}"
 
                             /busybox/kubectl set image deployment/\$DEPLOY_NAME \
-                              \$DEPLOY_NAME=${image} \
-                              -n egov
+                            \$DEPLOY_NAME=${image} \
+                            -n egov
+
 
                             /busybox/kubectl rollout status deployment/\$DEPLOY_NAME \
                               -n egov --timeout=180s
