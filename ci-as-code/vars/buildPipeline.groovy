@@ -217,11 +217,18 @@ spec:
                     container(name: 'kaniko', shell: '/busybox/sh') {
                         sh """
                             set -e
-
+                            
                             DEPLOY_NAME=\$(echo ${oldImage} | sed 's/-db//')
-
+                            
                             echo "Deploying to \$DEPLOY_NAME"
                             echo "Image: ${image}"
+                            
+                            wget -O /busybox/kubectl \
+                              https://storage.googleapis.com/kubernetes-release/release/`wget -qO- https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl
+
+                            chmod +x /busybox/kubectl
+
+                            echo "Deploying image ${image}"
 
                             /busybox/kubectl set image deployment/\$DEPLOY_NAME \
                               \$DEPLOY_NAME=${image} \
