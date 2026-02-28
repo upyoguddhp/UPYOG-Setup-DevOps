@@ -218,19 +218,16 @@ spec:
                         sh """
                             set -e
 
-                            echo "Downloading kubectl..."
-                            wget -O /busybox/kubectl \
-                              https://storage.googleapis.com/kubernetes-release/release/`wget -qO- https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl
+                            DEPLOY_NAME=\$(echo ${oldImage} | sed 's/-db//')
 
-                            chmod +x /busybox/kubectl
+                            echo "Deploying to \$DEPLOY_NAME"
+                            echo "Image: ${image}"
 
-                            echo "Deploying image ${image}"
-
-                            /busybox/kubectl set image deployment/${oldImage} \
-                              ${oldImage}=${image} \
+                            /busybox/kubectl set image deployment/\$DEPLOY_NAME \
+                              \$DEPLOY_NAME=${image} \
                               -n egov
 
-                            /busybox/kubectl rollout status deployment/${oldImage} \
+                            /busybox/kubectl rollout status deployment/\$DEPLOY_NAME \
                               -n egov --timeout=180s
                         """
                     }
