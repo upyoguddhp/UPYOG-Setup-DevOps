@@ -215,39 +215,20 @@ spec:
                 }
                 stage('Deploy Service') {
                   container(name: 'kaniko', shell: '/busybox/sh') {
-
                       script {
 
-                          // Extract last part of image (after last /)
                           def imageNameOnly = image.tokenize('/').last()
-                          // garbage-service-db:multi-cancellation-3a1432a040-10
-
                           def namePart = imageNameOnly.tokenize(':')[0]
                           def tagPart  = imageNameOnly.tokenize(':')[1]
-
-                          // Remove -db suffix
                           def deployName = namePart.replaceAll(/-db$/, '')
 
-                          // Build final image WITHOUT docker.io and WITHOUT -db
                           def finalImage = "upyoguddhp/${deployName}:${tagPart}"
 
-                          echo "Deployment name: ${deployName}"
-                          echo "Final image: ${finalImage}"
+                          echo "Triggering deploy-as-code for ${finalImage}"
 
                           sh """
-                              set -e
-
-                              wget -O /busybox/kubectl \
-                                https://storage.googleapis.com/kubernetes-release/release/\$(wget -qO- https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
-
-                              chmod +x /busybox/kubectl
-
-                              /busybox/kubectl set image deployment/${deployName} \
-                              ${deployName}=${finalImage} \
-                              -n egov
-
-                              /busybox/kubectl rollout status deployment/${deployName} \
-                              -n egov --timeout=180s
+                              cd UPYOG-Setup-DevOps/deploy-as-code/deployer
+                              go run main.go deploy -c -e upyog-demo "${finalImage}"
                           """
                       }
                   }
