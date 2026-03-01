@@ -214,35 +214,44 @@ spec:
                     }
                 }
                 stage('Deploy Service') {
-                    container(name: 'kaniko', shell: '/busybox/sh') {
-                        sh """
-                            set -e
-                            echo "Full image: ${image}"
-                            IMAGE_NAME=\$(echo ${image} | awk -F/ '{print \$NF}')
-                            IMAGE_NAME=\$(echo \$IMAGE_NAME | cut -d: -f1)
-                            DEPLOY_NAME=\$(echo \$IMAGE_NAME | sed 's/-db\$//')
+                  container(name: 'kaniko', shell: '/busybox/sh') {
 
-                            echo "Deployment name: \$DEPLOY_NAME"
-                            echo "Deploying image: ${image}"
+                      script {
 
-                            
-                            wget -O /busybox/kubectl \
-                              https://storage.googleapis.com/kubernetes-release/release/`wget -qO- https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl
+                          // Extract last part of image (after last /)
+                          def imageNameOnly = image.tokenize('/').last()
+                          // garbage-service-db:multi-cancellation-3a1432a040-10
 
-                            chmod +x /busybox/kubectl
+                          def namePart = imageNameOnly.tokenize(':')[0]
+                          def tagPart  = imageNameOnly.tokenize(':')[1]
 
-                            echo "Deploying image ${image}"
+                          // Remove -db suffix
+                          def deployName = namePart.replaceAll(/-db$/, '')
 
-                            /busybox/kubectl set image deployment/\$DEPLOY_NAME \
-                            \$DEPLOY_NAME=${image} \
-                            -n egov
+                          // Build final image WITHOUT docker.io and WITHOUT -db
+                          def finalImage = "upyoguddhp/${deployName}:${tagPart}"
 
+                          echo "Deployment name: ${deployName}"
+                          echo "Final image: ${finalImage}"
 
-                            /busybox/kubectl rollout status deployment/\$DEPLOY_NAME \
+                          sh """
+                              set -e
+
+                              wget -O /busybox/kubectl \
+                                https://storage.googleapis.com/kubernetes-release/release/\$(wget -qO- https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
+
+                              chmod +x /busybox/kubectl
+
+                              /busybox/kubectl set image deployment/${deployName} \
+                              ${deployName}=${finalImage} \
+                              -n egov
+
+                              /busybox/kubectl rollout status deployment/${deployName} \
                               -n egov --timeout=180s
-                        """
-                    }
-                }
+                          """
+                      }
+                  }
+              }
                
                 // stage ("Update dashboard") {
                 //         environmentDashboard {
