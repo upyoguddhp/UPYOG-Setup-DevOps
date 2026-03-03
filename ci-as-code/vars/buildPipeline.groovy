@@ -213,45 +213,45 @@ spec:
                         }
                     }
                 }
-                stage('Deploy Service') {
-                  container(name: 'kaniko', shell: '/busybox/sh') {
+              //   stage('Deploy Service') {
+              //     container(name: 'kaniko', shell: '/busybox/sh') {
 
-                      script {
+              //         script {
 
-                          // Extract last part of image (after last /)
-                          def imageNameOnly = image.tokenize('/').last()
-                          // garbage-service-db:multi-cancellation-3a1432a040-10
+              //             // Extract last part of image (after last /)
+              //             def imageNameOnly = image.tokenize('/').last()
+              //             // garbage-service-db:multi-cancellation-3a1432a040-10
 
-                          def namePart = imageNameOnly.tokenize(':')[0]
-                          def tagPart  = imageNameOnly.tokenize(':')[1]
+              //             def namePart = imageNameOnly.tokenize(':')[0]
+              //             def tagPart  = imageNameOnly.tokenize(':')[1]
 
-                          // Remove -db suffix
-                          def deployName = namePart.replaceAll(/-db$/, '')
+              //             // Remove -db suffix
+              //             def deployName = namePart.replaceAll(/-db$/, '')
 
-                          // Build final image WITHOUT docker.io and WITHOUT -db
-                          def finalImage = "upyoguddhp/${deployName}:${tagPart}"
+              //             // Build final image WITHOUT docker.io and WITHOUT -db
+              //             def finalImage = "upyoguddhp/${deployName}:${tagPart}"
 
-                          echo "Deployment name: ${deployName}"
-                          echo "Final image: ${finalImage}"
+              //             echo "Deployment name: ${deployName}"
+              //             echo "Final image: ${finalImage}"
 
-                          sh """
-                              set -e
+              //             sh """
+              //                 set -e
 
-                              wget -O /busybox/kubectl \
-                                https://storage.googleapis.com/kubernetes-release/release/\$(wget -qO- https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
+              //                 wget -O /busybox/kubectl \
+              //                   https://storage.googleapis.com/kubernetes-release/release/\$(wget -qO- https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
 
-                              chmod +x /busybox/kubectl
+              //                 chmod +x /busybox/kubectl
 
-                              /busybox/kubectl set image deployment/${deployName} \
-                              ${deployName}=${finalImage} \
-                              -n egov
+              //                 /busybox/kubectl set image deployment/${deployName} \
+              //                 ${deployName}=${finalImage} \
+              //                 -n egov
 
-                              /busybox/kubectl rollout status deployment/${deployName} \
-                              -n egov --timeout=180s
-                          """
-                      }
-                  }
-               }
+              //                 /busybox/kubectl rollout status deployment/${deployName} \
+              //                 -n egov --timeout=180s
+              //             """
+              //         }
+              //     }
+              //  }
                
                 // stage ("Update dashboard") {
                 //         environmentDashboard {
