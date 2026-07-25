@@ -156,6 +156,15 @@ spec:
                                 if( ! fileExists(buildConfig.getWorkDir()) || ! fileExists(buildConfig.getDockerFile()))
                                     throw new Exception("Working directory / dockerfile does not exist!");
 
+                                // --- Inject env file into the Docker build context before Kaniko runs ---
+                                withCredentials([file(credentialsId: 'hp-udd-prod', variable: 'ENV_FILE')]) {
+                                    sh """
+                                        cp \$ENV_FILE ${buildConfig.getContext()}/.env
+                                    """
+                                }
+                                echo "Injected .env into ${buildConfig.getContext()}"
+                                // --- end injection ---
+
                                 String workDir = buildConfig.getWorkDir().replaceFirst(getCommonBasePath(buildConfig.getWorkDir(), buildConfig.getDockerFile()), "./")
                                 oldImage =  buildConfig.getImageName()
                                 if(scmVars.BRANCH.equalsIgnoreCase("master")) {
